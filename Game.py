@@ -80,10 +80,45 @@ class TitleScreen:
 
         return surface.convert()
 
+    def cursor_up(self):
+        self.cursor_pos -= 1
+        self.cursor_pos %= len(self.options)
+
+    def cursor_down(self):
+        self.cursor_pos += 1
+        self.cursor_pos %= len(self.options)
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    sys.exit()
+
+                elif event.type == KEYDOWN:
+                    if event.key == K_UP:
+                        self.cursor_up()
+
+                    elif event.key == K_DOWN:
+                        self.cursor_down()
+
+                    elif event.key in [K_RETURN, K_a]:
+                        running = False
+
+                    else:
+                        pass
+
+                else:
+                    pass
+
+            DISPLAY.blit(self.get_surface(), (0, 0))
+            pygame.display.flip()
+
+        return self.options[self.cursor_pos]
+
 # Chargement des scènes du jeu :
 titlescreen = TitleScreen()
 
 # Lancement du jeu :
-DISPLAY .blit(titlescreen.get_surface(), (0, 0))
-pygame.display.flip()
+print(titlescreen.run())
 input()
