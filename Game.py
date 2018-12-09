@@ -116,8 +116,58 @@ class TitleScreen:
 
         return self.options[self.cursor_pos]
 
+class SaveChoose:
+    pass
+
+class LoadingScene:
+    pass
+
+class Field:
+    pass
+
+class Battle:
+    pass
+
+# Création des Instances du jeu :
+class Save:
+    pass
+
+class Options:
+    pass
+
+class Map:
+    pass
+
+class Player:
+    pass
+
+class Entity:
+    pass
+
+class NPC(Entity):
+    pass
+
+class Door(Entity):
+    pass
+
+class Tp(Entity):
+    pass
+
+class Chest(Entity):
+    pass
+
+class Pokemon(Entity):
+    pass
+
+class Dresseur(NPC):
+    pass
+
 # Chargement des scènes du jeu :
 titlescreen = TitleScreen()
+savechoose = SaveChoose()
+loadingscene = LoadingScene()
+field = Field()
+battle = Battle()
 
 # Lancement du jeu :
 print(titlescreen.run())
