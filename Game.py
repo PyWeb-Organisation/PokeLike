@@ -17,7 +17,7 @@ import os
 pygame.init()
 
 # Création des contantes du jeu :
-window_size = (27*32, 21*32)
+window_size = (21*32, 21*32)
 window_title = "PyWeb | PokéLike - "
 
 # Création des couleurs :
@@ -58,18 +58,21 @@ class TitleScreen:
     def __init__(self):
         self.options = ["Nouvelle Partie", "Continuer", "Options", "Quitter"]
         self.cursor_pos = 0
-        self.background = Surface(window_size, HWSURFACE)
+        self.background = pygame.Surface(window_size, HWSURFACE)
+        self.cursor = pygame.Surface((window_size[0]/4, 32), HWSURFACE | SRCALPHA)
         self.get_background()
 
     def get_background(self):
-        cursor = pygame.Surface((window_size[0]/2, 64), HWSURFACE | SRCALPHA)
-        cursor.fill(get_alpha(WHITE, 100))
-        pygame.draw.rect(cursor, WHITE, (0, 0, window_size[0]/2, 64), 2)
+        self.cursor.fill(get_alpha(WHITE, 100))
+        pygame.draw.rect(self.cursor, WHITE, (0, 0, window_size[0]/4, 32), 2)
 
         self.background.blit(BACKGROUND_TITLESCREEN, (0, 0))
         text = poke_solid_font_big.render("PokéLike", True, YELLOW)
         text_rect = text.get_rect(center=(window_size[0]/2, window_size[1]/4))
         self.background.blit(text, text_rect)
+
+        self.background = self.background.convert(BACKGROUND)
+        self.cursor = self.cursor.convert_alpha()
 
     def get_surface(self):
         surface = pygame.Surface(window_size, HWSURFACE)
@@ -78,9 +81,9 @@ class TitleScreen:
 
         for i, option in enumerate(self.options):
             if i == self.cursor_pos:
-                surface.blit(cursor, (window_size[0]/4, window_size[1]/2 + i*64))
-            text = poke_solid_font_medium.render(option, True, YELLOW)
-            text_rect = text.get_rect(center=(window_size[0]/2, 32 + window_size[1]/2 + i*64))
+                surface.blit(self.cursor, (3*window_size[0]/4-32, 3*window_size[1]/4 + i*32))
+            text = poke_solid_font_small.render(option, True, YELLOW)
+            text_rect = text.get_rect(midright=(window_size[0]-48, 16 + 3*window_size[1]/4 + i*32))
             surface.blit(text, text_rect)
 
         return surface.convert()
