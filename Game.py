@@ -22,13 +22,14 @@ window_title = "PyWeb | PokéLike - "
 
 # Création des couleurs :
 WHITE = (255, 255, 255)
-BLACK = (255, 255, 255)
+BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 CYAN = (0, 255, 255)
 MAGENTA = (255, 0, 255)
+GOLD = (175, 175, 0)
 
 # Création de la fenêtre du jeu :
 DISPLAY = pygame.display.set_mode(window_size, HWSURFACE | DOUBLEBUF)
@@ -50,6 +51,17 @@ poke_solid_font_small = pygame.font.Font("Assets\\fonts\\Pokemon Solid.ttf", 16)
 def get_alpha(color, alpha):
     return color[0], color[1], color[2], alpha
 
+def set_text(surface, text, font, color, shadow=(0, 0, 0, 0), **kwargs):
+    shadow_pos = {}
+    for key in kwargs:
+        shadow_pos[key] = (kwargs[key][0]+1, kwargs[key][1]+1)
+    surf = font.render(text, True, color)
+    shadow = font.render(text, True, shadow)
+    surf_rect = surf.get_rect(**kwargs)
+    shadow_rect = shadow.get_rect(**shadow_pos)
+    surface.blit(shadow, shadow_rect)
+    surface.blit(surf, surf_rect)
+
 # Création des scènes du jeu :
 class TitleScreen:
     """
@@ -63,13 +75,11 @@ class TitleScreen:
         self.get_background()
 
     def get_background(self):
-        self.cursor.fill(get_alpha(WHITE, 100))
-        pygame.draw.rect(self.cursor, WHITE, (0, 0, window_size[0]/4, 32), 2)
+        self.cursor.fill(get_alpha(BLUE, 100))
+        pygame.draw.rect(self.cursor, BLUE, (0, 0, window_size[0]/4, 32), 2)
 
         self.background.blit(BACKGROUND_TITLESCREEN, (0, 0))
-        text = poke_solid_font_big.render("PokéLike", True, YELLOW)
-        text_rect = text.get_rect(center=(window_size[0]/2, window_size[1]/4))
-        self.background.blit(text, text_rect)
+        set_text(self.background, "PokéLike", poke_solid_font_big, YELLOW, WHITE, center=(window_size[0]/2, window_size[1]/4))
 
         self.background = self.background.convert(BACKGROUND)
         self.cursor = self.cursor.convert_alpha()
@@ -82,9 +92,7 @@ class TitleScreen:
         for i, option in enumerate(self.options):
             if i == self.cursor_pos:
                 surface.blit(self.cursor, (3*window_size[0]/4-32, 3*window_size[1]/4 + i*32))
-            text = poke_solid_font_small.render(option, True, YELLOW)
-            text_rect = text.get_rect(midright=(window_size[0]-48, 16 + 3*window_size[1]/4 + i*32))
-            surface.blit(text, text_rect)
+            set_text(surface, option, poke_solid_font_small, GOLD, BLACK, midright=(window_size[0]-48, 16 + 3*window_size[1]/4 + i*32))
 
         return surface.convert()
 
