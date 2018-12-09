@@ -58,18 +58,23 @@ class TitleScreen:
     def __init__(self):
         self.options = ["Nouvelle Partie", "Continuer", "Options", "Quitter"]
         self.cursor_pos = 0
+        self.background = Surface(window_size, HWSURFACE)
+        self.get_background()
 
-    def get_surface(self):
-        surface = pygame.Surface(window_size, HWSURFACE)
-
+    def get_background(self):
         cursor = pygame.Surface((window_size[0]/2, 64), HWSURFACE | SRCALPHA)
         cursor.fill(get_alpha(WHITE, 100))
         pygame.draw.rect(cursor, WHITE, (0, 0, window_size[0]/2, 64), 2)
 
-        surface.blit(BACKGROUND_TITLESCREEN, (0, 0))
+        self.background.blit(BACKGROUND_TITLESCREEN, (0, 0))
         text = poke_solid_font_big.render("PokéLike", True, YELLOW)
         text_rect = text.get_rect(center=(window_size[0]/2, window_size[1]/4))
-        surface.blit(text, text_rect)
+        self.background.blit(text, text_rect)
+
+    def get_surface(self):
+        surface = pygame.Surface(window_size, HWSURFACE)
+
+        surface.blit(self.background, (0, 0))
 
         for i, option in enumerate(self.options):
             if i == self.cursor_pos:
