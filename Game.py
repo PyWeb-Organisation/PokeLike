@@ -19,6 +19,7 @@ pygame.init()
 # Création des contantes du jeu :
 window_size = (21*32, 21*32)
 window_title = "PyWeb | PokéLike - "
+tile_size = 32
 
 # Création des couleurs :
 WHITE = (255, 255, 255)
@@ -132,9 +133,6 @@ class TitleScreen:
 
         return self.options[self.cursor_pos]
 
-class SaveChoose:
-    pass
-
 class LoadingScene:
     pass
 
@@ -151,8 +149,136 @@ class Save:
 class Options:
     pass
 
+class TileSet:
+    """
+    TileSet used for building maps
+    """
+    def __init__(self, name):
+        self.name = name
+        self.cut_tiles()
+
+    def cut_tiles(self):
+        tiles_file = "Assets\\tileset\\{}.png".format(name)
+        hitbox_file = "Assets\\tileset\\{}.hitbox".format(name)
+        tiles = pygame.image.load(tiles_file).convert_alpha()
+        hitbox = []
+        self.tiles = []
+        with open(hitbox_file, "r") as file:
+            for line in file:
+                if not line == "":
+                    hitbox.append(int(line))
+            file.close()
+
+        sizes = [x//32 for x in tiles.get_size()]
+        for j in range(size[1]):
+            for i in range(size[0]):
+                surf = pygame.surface((tile_size, tiles_size), HWSURFACE | SRCALPHA)
+                surf.blit(tiles, (-i*32, -j*32))
+                self.tiles.append({"surface": surf.convert_alpha(), "hitbox": hitbox[32*j + i]})
+
+
 class Map:
-    pass
+    """
+    Map System
+    """
+    def __init__(self, file):
+        self.file = file
+        self.entities = []
+        self.decode_file()
+        self.build_surface()
+
+    def decode_file(self):
+        self.tilesets = []
+        self.size = []
+        self.layouts = {}
+        layout1 = False
+        layout2 = False
+        layout3 = False
+        current_layout = []
+
+        with open(self.file, 'r') as file:
+            for line in file:
+                line = line[:-1]
+                if not line == "" and not layout1 and not layout2 and not layout3:
+                    if line == "[Layout1]":
+                        layout1 = True
+                        current_layout = []
+
+                    elif line == "[Layout2]":
+                        layout2 = True
+
+                    elif line == "[Layout3]":
+                        layout3 = True
+
+                    else:
+                        variable, content = line.split(":")
+                        if variable[:-1] == "size":
+                            self.size = [int(value) for value in line[1:].split(", ")]
+
+                        elif variable[:-1] == "tileset":
+                            self.tilesets.append(TileSet(content[1:]))
+
+                        else:
+                            pass
+
+                elif layout1:
+                    if line == "[\Layout1]":
+                        layout1 = False
+                        self.layouts["ground"] = current_layout
+                        current_layout = []
+
+                    else:
+                        current_layout.append([int(value) for value in line.split(" ")])
+
+                elif layout2:
+                    if line == "[\Layout2]":
+                        layout2 = False
+                        self.layouts["objects"] = current_layout
+                        current_layout = []
+
+                    else:
+                        current_layout.append([int(value) for value in line.split(" ")])
+
+                elif layout3:
+                    if line == "[\Layout3]":
+                        layout3 = False
+                        self.layouts["air"] = current_layout
+                        current_layout = []
+
+                    else:
+                        current_layout.append([int(value) for value in line.split(" ")])
+
+                else:
+                    pass
+
+            file.close()
+
+        self.tileset = []
+        for tileset in tilesets:
+            self.tileset += tileset.tiles
+
+    def build_surface(self):
+        self.layout1 = pygame.Surface((32*self.size[0], 32*self.size[1]), HWSURFACE, SRCALPHA)
+        self.layout2 = pygame.Surface((32*self.size[0], 32*self.size[1]), HWSURFACE, SRCALPHA)
+        self.layout3 = pygame.Surface((32*self.size[0], 32*self.size[1]), HWSURFACE, SRCALPHA)
+        self.map_hitbox = [[0 for x in range(self.size[0])] for x in range(self.size[1])]
+        for i, tile in enumerate(self.layouts["ground"]):
+            x = i%self.size[1]
+            y = i//self.size[1]
+            self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+            self.layout1.blit(self.tilset[tile]["surface"], (x*32, y*32))
+
+        for i, tile in enumerate(self.layouts["objects"]):
+            x = i%self.size[1]
+            y = i//self.size[1]
+            self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+            self.layout2.blit(self.tilset[tile]["surface"], (x*32, y*32))
+
+        for i, tile in enumerate(self.layouts["air"]):
+            x = i%self.size[1]
+            y = i//self.size[1]
+            self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+            self.layout3.blit(self.tilset[tile]["surface"], (x*32, y*32))
 
 class Player:
     pass
@@ -178,6 +304,8 @@ class Pokemon(Entity):
 class Dresseur(NPC):
     pass
 
+# Chargement des composants du jeu
+
 # Chargement des scènes du jeu :
 titlescreen = TitleScreen()
 savechoose = SaveChoose()
@@ -187,4 +315,3 @@ battle = Battle()
 
 # Lancement du jeu :
 print(titlescreen.run())
-input()
