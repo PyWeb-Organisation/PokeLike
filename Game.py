@@ -17,9 +17,9 @@ import os
 pygame.init()
 
 # Création des contantes du jeu :
-window_size = (21*32, 21*32)
+window_size = (41*16, 41*16)
 window_title = "PyWeb | PokéLike - "
-tile_size = 32
+tile_size = 16
 
 # Création des couleurs :
 WHITE = (255, 255, 255)
@@ -158,24 +158,23 @@ class TileSet:
         self.cut_tiles()
 
     def cut_tiles(self):
-        tiles_file = "Assets\\tileset\\{}.png".format(name)
-        hitbox_file = "Assets\\tileset\\{}.hitbox".format(name)
+        tiles_file = "Assets\\tilesets\\{}.png".format(self.name)
+        hitbox_file = "Assets\\tilesets\\{}.hitbox".format(self.name)
         tiles = pygame.image.load(tiles_file).convert_alpha()
         hitbox = []
         self.tiles = []
         with open(hitbox_file, "r") as file:
             for line in file:
                 if not line == "":
-                    hitbox.append(int(line))
+                    hitbox += [int(value) for value in line[:-1].split(" ")]
             file.close()
 
-        sizes = [x//32 for x in tiles.get_size()]
+        size = [x//tile_size for x in tiles.get_size()]
         for j in range(size[1]):
             for i in range(size[0]):
-                surf = pygame.surface((tile_size, tiles_size), HWSURFACE | SRCALPHA)
-                surf.blit(tiles, (-i*32, -j*32))
-                self.tiles.append({"surface": surf.convert_alpha(), "hitbox": hitbox[32*j + i]})
-
+                surf = pygame.Surface((tile_size, tile_size), HWSURFACE | SRCALPHA)
+                surf.blit(tiles, (-i*tile_size, -j*tile_size))
+                self.tiles.append({"surface": surf.convert_alpha(), "hitbox": hitbox[size[0]*j + i]})
 
 class Map:
     """
@@ -258,27 +257,27 @@ class Map:
             self.tileset += tileset.tiles
 
     def build_surface(self):
-        self.layout1 = pygame.Surface((32*self.size[0], 32*self.size[1]), HWSURFACE, SRCALPHA)
-        self.layout2 = pygame.Surface((32*self.size[0], 32*self.size[1]), HWSURFACE, SRCALPHA)
-        self.layout3 = pygame.Surface((32*self.size[0], 32*self.size[1]), HWSURFACE, SRCALPHA)
+        self.layout1 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE, SRCALPHA)
+        self.layout2 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE, SRCALPHA)
+        self.layout3 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE, SRCALPHA)
         self.map_hitbox = [[0 for x in range(self.size[0])] for x in range(self.size[1])]
         for i, tile in enumerate(self.layouts["ground"]):
             x = i%self.size[1]
             y = i//self.size[1]
             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-            self.layout1.blit(self.tilset[tile]["surface"], (x*32, y*32))
+            self.layout1.blit(self.tilset[tile]["surface"], (x*tile_size, y*tile_size))
 
         for i, tile in enumerate(self.layouts["objects"]):
             x = i%self.size[1]
             y = i//self.size[1]
             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-            self.layout2.blit(self.tilset[tile]["surface"], (x*32, y*32))
+            self.layout2.blit(self.tilset[tile]["surface"], (x*tile_size, y*tile_size))
 
         for i, tile in enumerate(self.layouts["air"]):
             x = i%self.size[1]
             y = i//self.size[1]
             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-            self.layout3.blit(self.tilset[tile]["surface"], (x*32, y*32))
+            self.layout3.blit(self.tilset[tile]["surface"], (x*tile_size, y*tile_size))
 
 class Player:
     pass
@@ -305,13 +304,15 @@ class Dresseur(NPC):
     pass
 
 # Chargement des composants du jeu
+main_tileset = TileSet("main_tile_set")
 
 # Chargement des scènes du jeu :
 titlescreen = TitleScreen()
-savechoose = SaveChoose()
 loadingscene = LoadingScene()
 field = Field()
 battle = Battle()
 
 # Lancement du jeu :
 print(titlescreen.run())
+print(main_tileset.tiles)
+input()
