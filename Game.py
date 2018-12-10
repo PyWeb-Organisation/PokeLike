@@ -201,7 +201,6 @@ class Map:
                 if not line == "" and not layout1 and not layout2 and not layout3:
                     if line == "[Layout1]":
                         layout1 = True
-                        current_layout = []
 
                     elif line == "[Layout2]":
                         layout2 = True
@@ -210,42 +209,43 @@ class Map:
                         layout3 = True
 
                     else:
-                        variable, content = line.split(":")
-                        if variable[:-1] == "size":
-                            self.size = [int(value) for value in line[1:].split(", ")]
+                        print(line)
+                        variable, content = line.split(" : ")
+                        if variable == "size":
+                            self.size = [int(value) for value in content.split(", ")]
 
-                        elif variable[:-1] == "tileset":
-                            self.tilesets.append(TileSet(content[1:]))
+                        elif variable == "tileset":
+                            self.tilesets.append(TileSet(content))
 
                         else:
                             pass
 
                 elif layout1:
-                    if line == "[\Layout1]":
+                    if line == "[/Layout1]":
                         layout1 = False
                         self.layouts["ground"] = current_layout
                         current_layout = []
 
-                    else:
-                        current_layout.append([int(value) for value in line.split(" ")])
+                    elif not line == "[Layout1]":
+                        current_layout += [int(value) for value in line.split(" ")]
 
                 elif layout2:
-                    if line == "[\Layout2]":
+                    if line == "[/Layout2]":
                         layout2 = False
                         self.layouts["objects"] = current_layout
                         current_layout = []
 
-                    else:
-                        current_layout.append([int(value) for value in line.split(" ")])
+                    elif not line == "[Layout2]":
+                        current_layout += [int(value) for value in line.split(" ")]
 
                 elif layout3:
-                    if line == "[\Layout3]":
+                    if line == "[/Layout3]":
                         layout3 = False
                         self.layouts["air"] = current_layout
                         current_layout = []
 
-                    else:
-                        current_layout.append([int(value) for value in line.split(" ")])
+                    elif not line == "[Layout3]":
+                        current_layout += [int(value) for value in line.split(" ")]
 
                 else:
                     pass
@@ -253,31 +253,35 @@ class Map:
             file.close()
 
         self.tileset = []
-        for tileset in tilesets:
+        for tileset in self.tilesets:
             self.tileset += tileset.tiles
 
     def build_surface(self):
-        self.layout1 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE, SRCALPHA)
-        self.layout2 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE, SRCALPHA)
-        self.layout3 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE, SRCALPHA)
+        self.layout1 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+        self.layout2 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+        self.layout3 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
         self.map_hitbox = [[0 for x in range(self.size[0])] for x in range(self.size[1])]
         for i, tile in enumerate(self.layouts["ground"]):
             x = i%self.size[1]
             y = i//self.size[1]
             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-            self.layout1.blit(self.tilset[tile]["surface"], (x*tile_size, y*tile_size))
+            self.layout1.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
 
         for i, tile in enumerate(self.layouts["objects"]):
             x = i%self.size[1]
             y = i//self.size[1]
             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-            self.layout2.blit(self.tilset[tile]["surface"], (x*tile_size, y*tile_size))
+            self.layout2.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
 
         for i, tile in enumerate(self.layouts["air"]):
             x = i%self.size[1]
             y = i//self.size[1]
             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-            self.layout3.blit(self.tilset[tile]["surface"], (x*tile_size, y*tile_size))
+            self.layout3.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+
+        self.layout1 = self.layout1.convert_alpha()
+        self.layout2 = self.layout2.convert_alpha()
+        self.layout3 = self.layout3.convert_alpha()
 
 class Player:
     pass
@@ -306,6 +310,8 @@ class Dresseur(NPC):
 # Chargement des composants du jeu
 main_tileset = TileSet("main_tile_set")
 
+map001 = Map("Assets\\maps\\map001.map")
+
 # Chargement des scènes du jeu :
 titlescreen = TitleScreen()
 loadingscene = LoadingScene()
@@ -314,5 +320,9 @@ battle = Battle()
 
 # Lancement du jeu :
 print(titlescreen.run())
-print(main_tileset.tiles)
+DISPLAY.fill(BLACK)
+DISPLAY.blit(map001.layout1, (0, 0))
+DISPLAY.blit(map001.layout2, (0, 0))
+DISPLAY.blit(map001.layout3, (0, 0))
+pygame.display.flip()
 input()
