@@ -20,7 +20,7 @@ tileset : main_tile_set
 [Layout3]
 0 0 0 0 0
 0 0 0 0 0
-0 0 0 0 0
+0 0 298 0 0
 0 0 0 0 0
 0 0 0 0 0
 [/Layout3]
