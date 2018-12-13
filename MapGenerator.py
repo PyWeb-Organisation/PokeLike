@@ -42,25 +42,8 @@ def save_map(size, tilesets, layouts, filename):
         file.write("[/Layout3]")
         file.close()
 
-def create_new_map():
-    global sizes, entry1, entry2
-    f = tkinter.Tk()
-    size1 = tkinter.StringVar()
-    size2 = tkinter.StringVar()
-    entry1 = tkinter.Entry(f, textvariable=size1)
-    entry2 = tkinter.Entry(f, textvariable=size2)
-    sizes = []
-    def get_entries():
-        global sizes
-        print(sizes)
-        sizes = [int(entry1.get()), int(entry2.get())]
-        f.destroy()
-    button = tkinter.Button(f, text="Valider", command=get_entries)
-    entry1.grid(row=0, column=0)
-    entry2.grid(row=1, column=0)
-    button.grid(row=1, column=1)
-    f.mainloop()
-    return Map(sizes, [])
+def create_new_map()
+
 
 class TileSet:
     """
@@ -89,6 +72,10 @@ class TileSet:
                 surf.blit(tiles, (-i*tile_size, -j*tile_size))
                 self.tiles.append({"surface": surf.convert_alpha(), "hitbox": hitbox[size[0]*j + i]})
 
+
+
+
+
 class Map:
     """
     Map prévu pour le jeu [PokéLike]
@@ -106,12 +93,39 @@ class Map:
         self.tilesets_names.append(tileset.name)
         self.tileset += tileset.tiles
 
+    def build_surface(self):
+         self.layout1 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+         self.layout2 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+         self.layout3 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+         self.map_hitbox = [[0 for x in range(self.size[0])] for x in range(self.size[1])]
+         for i, tile in enumerate(self.layouts["ground"]):
+             x = i%self.size[1]
+             y = i//self.size[1]
+             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+             self.layout1.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+
+         for i, tile in enumerate(self.layouts["objects"]):
+             x = i%self.size[1]
+             y = i//self.size[1]
+             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+             self.layout2.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+
+         for i, tile in enumerate(self.layouts["air"]):
+             x = i%self.size[1]
+             y = i//self.size[1]
+             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+             self.layout3.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+
+         self.layout1 = self.layout1.convert_alpha()
+         self.layout2 = self.layout2.convert_alpha()
+         self.layout3 = self.layout3.convert_alpha()
+
+
+
+
 class App:
     """
     Prcesseur logique de l'application
     """
     def __init__(self):
         self.current_map = Map([0, 0], [])
-
-print(create_new_map())
-input()
