@@ -283,7 +283,28 @@ class Map:
         self.layout3 = self.layout3.convert_alpha()
 
 class Player:
-    pass
+    """personnage du jeu"""
+     def __init__(self):#initialisation la totalité des variables du personnage
+            self.name = "" #Initialisation du nom
+            self.skin = ""#Initialisation de l'apparence
+            self.x = 0#Coordonnées x du personnage
+            self.y = 0#Coordonnée y du personnage
+
+    def go_up(self):#Aller en haut
+        self.y += 1
+
+    def go_down(self):#Aller en bas
+        self.y -= 1
+
+    def go_right(self):#Aller à droite
+        self.x += 1
+
+    def go_left(self):#Aller à gauche
+        self.x -= 1
+
+
+
+
 
 class Entity:
     pass
@@ -301,7 +322,11 @@ class Chest(Entity):
     pass
 
 class Pokemon(Entity):
-    pass
+    """Pokémons"""
+    def __init__(self):#Initialisation de la totalité des variables des pokémons
+        self.name = ""#Initialisation du nom
+        self.skin = ""#Initialisation de l'apparence
+
 
 class Dresseur(NPC):
     pass
