@@ -302,10 +302,6 @@ class Player:
     def go_left(self):#Aller à gauche
         self.x -= 1
 
-
-
-
-
 class Entity:
     pass
 

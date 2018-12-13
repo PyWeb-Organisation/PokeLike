@@ -42,8 +42,24 @@ def save_map(size, tilesets, layouts, filename):
         file.write("[/Layout3]")
         file.close()
 
-def create_new_map()
-
+def create_new_map():
+    global sizes
+    sizes = []
+    f = tkinter.Tk()
+    size1 = tkinter.StringVar()
+    size2 = tkinter.StringVar()
+    entry1 = tkinter.Entry(f, textvariable=size1)
+    entry2 = tkinter.Entry(f, textvariable=size2)
+    def get_size():
+        global sizes
+        sizes = [int(entry1.get()), int(entry2.get())]
+        f.destroy()
+    button = tkinter.Button(f, text="Valider", command=get_size)
+    entry1.grid(row=0, column=0)
+    entry2.grid(row=1, column=0)
+    button.grid(row=1, column=1)
+    f.mainloop()
+    return Map(sizes, [])
 
 class TileSet:
     """
@@ -71,10 +87,6 @@ class TileSet:
                 surf = pygame.Surface((tile_size, tile_size), HWSURFACE | SRCALPHA)
                 surf.blit(tiles, (-i*tile_size, -j*tile_size))
                 self.tiles.append({"surface": surf.convert_alpha(), "hitbox": hitbox[size[0]*j + i]})
-
-
-
-
 
 class Map:
     """
@@ -120,12 +132,13 @@ class Map:
          self.layout2 = self.layout2.convert_alpha()
          self.layout3 = self.layout3.convert_alpha()
 
-
-
-
 class App:
     """
     Prcesseur logique de l'application
     """
     def __init__(self):
         self.current_map = Map([0, 0], [])
+
+map = create_new_map()
+print(map.size)
+input()
