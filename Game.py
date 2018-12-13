@@ -284,7 +284,7 @@ class Map:
 
 class Player:
     """personnage du jeu"""
-     def __init__(self):#initialisation la totalité des variables du personnage
+    def __init__(self):#initialisation la totalité des variables du personnage
             self.name = "" #Initialisation du nom
             self.skin = ""#Initialisation de l'apparence
             self.x = 0#Coordonnées x du personnage

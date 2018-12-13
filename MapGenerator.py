@@ -15,6 +15,9 @@ import tkinter
 import os
 import sys
 
+pygame.display.init()
+display = pygame.display.set_mode((1, 1))
+
 # Création des variables globales du script :
 tile_size = 16
 
@@ -139,6 +142,85 @@ class App:
     def __init__(self):
         self.current_map = Map([0, 0], [])
 
-map = create_new_map()
-print(map.size)
+    def add_tileset_to_map(self):
+        path = fd.askopenfilename()
+        filename = os.path.splitext(os.path.basename(path))[0]
+        tileset = TileSet(filename)
+        self.current_map.add_tileset(tileset)
+
+    def create_map(self):
+        self.current_map = create_new_map()
+
+    def open_map(self):
+        path = fd.askopenfilename()
+        tilesets = []
+        size = []
+        layouts = [[], [], []]
+        layout1 = False
+        layout2 = False
+        layout3 = False
+        current_layout = []
+
+        with open(path, 'r') as file:
+            for line in file:
+                line = line[:-1]
+                if not line == "" and not layout1 and not layout2 and not layout3:
+                    if line == "[Layout1]":
+                        layout1 = True
+
+                    elif line == "[Layout2]":
+                        layout2 = True
+
+                    elif line == "[Layout3]":
+                        layout3 = True
+
+                    else:
+                        variable, content = line.split(" : ")
+                        if variable == "size":
+                            size = [int(value) for value in content.split(", ")]
+
+                        elif variable == "tileset":
+                            tilesets.append(TileSet(content))
+
+                        else:
+                            pass
+
+                elif layout1:
+                    if line == "[/Layout1]":
+                        layout1 = False
+                        layouts[0] = current_layout
+                        current_layout = []
+
+                    elif not line == "[Layout1]":
+                        current_layout.append([int(value) for value in line.split(" ")])
+
+                elif layout2:
+                    if line == "[/Layout2]":
+                        layout2 = False
+                        layouts[1] = current_layout
+                        current_layout = []
+
+                    elif not line == "[Layout2]":
+                        current_layout.append([int(value) for value in line.split(" ")])
+
+                elif layout3:
+                    if line == "[/Layout3]":
+                        layout3 = False
+                        layouts[2] = current_layout
+                        current_layout = []
+
+                    elif not line == "[Layout3]":
+                        current_layout.append([int(value) for value in line.split(" ")])
+
+                else:
+                    pass
+
+            file.close()
+
+        self.current_map = Map(size, tilesets)
+        self.current_map.layouts = layouts
+
+app = App()
+app.open_map()
+print(app.current_map.layouts)
 input()
