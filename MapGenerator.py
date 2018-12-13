@@ -42,7 +42,26 @@ def save_map(size, tilesets, layouts, filename):
         file.write("[/Layout3]")
         file.close()
 
-def create_new_map()
+def create_new_map():
+    global sizes, entry1, entry2
+    f = tkinter.Tk()
+    size1 = tkinter.StringVar()
+    size2 = tkinter.StringVar()
+    entry1 = tkinter.Entry(f, textvariable=size1)
+    entry2 = tkinter.Entry(f, textvariable=size2)
+    sizes = []
+    def get_entries():
+        global sizes
+        print(sizes)
+        sizes = [int(entry1.get()), int(entry2.get())]
+        f.destroy()
+    button = tkinter.Button(f, text="Valider", command=get_entries)
+    entry1.grid(row=0, column=0)
+    entry2.grid(row=1, column=0)
+    button.grid(row=1, column=1)
+    f.mainloop()
+    return Map(sizes, [])
+
 
 class TileSet:
     """
@@ -94,3 +113,6 @@ class App:
     """
     def __init__(self):
         self.current_map = Map([0, 0], [])
+
+print(create_new_map())
+input()
