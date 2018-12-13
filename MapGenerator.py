@@ -62,7 +62,6 @@ def create_new_map():
     f.mainloop()
     return Map(sizes, [])
 
-
 class TileSet:
     """
     TileSet used for building maps
