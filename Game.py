@@ -209,7 +209,6 @@ class Map:
                         layout3 = True
 
                     else:
-                        print(line)
                         variable, content = line.split(" : ")
                         if variable == "size":
                             self.size = [int(value) for value in content.split(", ")]
