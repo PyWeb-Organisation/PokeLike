@@ -16,7 +16,7 @@ import os
 import sys
 
 pygame.display.init()
-display = pygame.display.set_mode((1, 1))
+display = pygame.display.set_mode((1000, 700))
 
 # Création des variables globales du script :
 tile_size = 16
@@ -108,32 +108,27 @@ class Map:
         self.tilesets_names.append(tileset.name)
         self.tileset += tileset.tiles
 
-    def build_surface(self):
-         self.layout1 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
-         self.layout2 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
-         self.layout3 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+    def get_surfaces(self):
+         layout1 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+         layout2 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
+         layout3 = pygame.Surface((tile_size*self.size[0], tile_size*self.size[1]), HWSURFACE | SRCALPHA)
          self.map_hitbox = [[0 for x in range(self.size[0])] for x in range(self.size[1])]
-         for i, tile in enumerate(self.layouts["ground"]):
-             x = i%self.size[1]
-             y = i//self.size[1]
-             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-             self.layout1.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+         for y, line in enumerate(self.layouts[0]):
+             for x, tile in enumerate(line):
+                 self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+                 layout1.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
 
-         for i, tile in enumerate(self.layouts["objects"]):
-             x = i%self.size[1]
-             y = i//self.size[1]
-             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-             self.layout2.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+         for y, line in enumerate(self.layouts[1]):
+             for x, tile in enumerate(line):
+                 self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+                 layout2.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
 
-         for i, tile in enumerate(self.layouts["air"]):
-             x = i%self.size[1]
-             y = i//self.size[1]
-             self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
-             self.layout3.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
+         for y, line in enumerate(self.layouts[2]):
+             for x, tile in enumerate(line):
+                 self.map_hitbox[y][x] = max(self.tileset[tile]["hitbox"], self.map_hitbox[y][x])
+                 layout3.blit(self.tileset[tile]["surface"], (x*tile_size, y*tile_size))
 
-         self.layout1 = self.layout1.convert_alpha()
-         self.layout2 = self.layout2.convert_alpha()
-         self.layout3 = self.layout3.convert_alpha()
+         return layout1.convert_alpha(), layout2.convert_alpha(), layout3.convert_alpha()
 
 class App:
     """
@@ -141,6 +136,7 @@ class App:
     """
     def __init__(self):
         self.current_map = Map([0, 0], [])
+        self.see_layout = 1
 
     def add_tileset_to_map(self):
         path = fd.askopenfilename()
@@ -220,7 +216,50 @@ class App:
         self.current_map = Map(size, tilesets)
         self.current_map.layouts = layouts
 
+    def run(self):
+        running = True
+        surface_bar = pygame.Surface((1000, 100), HWSURFACE | SRCALPHA)
+        surface_map = pygame.Surface((600, 600), HWSURFACE | SRCALPHA)
+        surface_tileset = pygame.Surface((400, 600), HWSURFACE | SRCALPHA)
+        camera_map = [0, 0]
+        camera_tileset = [0, 0]
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    running = False
+
+                elif event.type == MOUSEBUTTONDOWN:
+                    pass
+
+            layouts = self.current_map.get_surfaces()
+            surface_map.blit(layouts[0], camera_map)
+            if self.see_layout == 2:
+                surface = pygame.Surface((self.current_map.size[0]*16, self.current_map.size[1]*16), HWSURFACE | SRCALPHA)
+                surface.fill((0, 0, 0, 100))
+                surface_map.blit(surface, camera_map)
+                surface_map.blit(layouts[1], camera_map)
+
+            if self.see_layout == 3:
+                surface_map.blit(layouts[1], camera_map)
+                surface = pygame.Surface((self.current_map.size[0]*16, self.current_map.size[1]*16), HWSURFACE | SRCALPHA)
+                surface.fill((0, 0, 0, 100))
+                surface_map.blit(surface, camera_map)
+                surface_map.blit(layouts[2], camera_map)
+
+            y = 0
+
+            for name in self.current_map.tilesets_names:
+                tiles_file = "Assets\\tilesets\\{}.png".format(name)
+                tiles = pygame.image.load(tiles_file).convert_alpha()
+                surface_tileset.blit(tiles, (0, y))
+                y += tiles.get_size()[1]
+
+            display.blit(surface_bar, (0, 0))
+            display.blit(surface_map, (0, 100))
+            display.blit(surface_tileset, (600, 100))
+            pygame.display.flip()
+
 app = App()
 app.open_map()
-print(app.current_map.layouts)
-input()
+app.run()
