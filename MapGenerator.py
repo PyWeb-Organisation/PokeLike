@@ -16,10 +16,13 @@ import os
 import sys
 
 pygame.display.init()
-display = pygame.display.set_mode((1000, 700))
+display = pygame.display.set_mode((1032, 716))
 
 # Création des variables globales du script :
 tile_size = 16
+inutile = tkinter.Tk()
+inutile.geometry("0x0")
+inutile.overrideredirect(True)
 
 # Création des fonctions du script :
 def save_map(size, tilesets, layouts, filename):
@@ -221,8 +224,32 @@ class App:
         surface_bar = pygame.Surface((1000, 100), HWSURFACE | SRCALPHA)
         surface_map = pygame.Surface((600, 600), HWSURFACE | SRCALPHA)
         surface_tileset = pygame.Surface((400, 600), HWSURFACE | SRCALPHA)
-        camera_map = [0, 0]
-        camera_tileset = [0, 0]
+        tilesets = []
+        tileset_size_y = 0
+        tileset_size_x = 0
+        for name in self.current_map.tilesets_names:
+            tiles_file = "Assets\\tilesets\\{}.png".format(name)
+            tiles = pygame.image.load(tiles_file).convert_alpha()
+            size = tiles.get_size()
+            tileset_size_y += size[1]
+            tileset_size_x = max(tileset_size_x, size[0])
+            tilesets.append(tiles)
+        sidebar_map_x = 0
+        sidebar_map_y = 0
+        sidebar_tileset_x = 0
+        sidebar_tileset_y = 0
+        sidebar_map_x_size = 600**2 / (16*self.current_map.size[0])
+        sidebar_tileset_x_size = 400**2 / tileset_size_x
+        sidebar_map_y_size = 600**2 / (16*self.current_map.size[1])
+        sidebar_tileset_y_size = 600**2 / tileset_size_y
+        ram_map_x = -1
+        ram_map_y = -1
+        ram_tileset_x = -1
+        ram_tileset_y = -1
+        ecart_map_x = 0
+        ecart_map_y = 0
+        ecart_tileset_x = 0
+        ecart_tileset_y = 0
 
         while running:
             for event in pygame.event.get():
@@ -230,34 +257,154 @@ class App:
                     running = False
 
                 elif event.type == MOUSEBUTTONDOWN:
-                    pass
+                    if event.button == 1:
+                        pos = pygame.mouse.get_pos()
+                        if sidebar_map_x <= pos[0] <= sidebar_map_x+sidebar_map_x_size and 700 <= pos[1] <= 716:
+                            ram_map_x = pos[0]
+
+                        if 600 <= pos[0] <= 616 and 100+sidebar_map_y <= pos[1] <= 100+sidebar_map_y+sidebar_map_y_size:
+                            ram_map_y = pos[1]
+
+                        if 616+sidebar_tileset_x <= pos[0] <= 616+sidebar_tileset_x+sidebar_tileset_x_size and 700 <= pos[1] <= 716:
+                            ram_tileset_x = pos[0]
+
+                        if 1016 <= pos[0] <= 1032 and 100+sidebar_tileset_y <= pos[1] <= 100+sidebar_tileset_y+sidebar_tileset_y_size:
+                            ram_tileset_y = pos[1]
+
+                elif event.type == MOUSEBUTTONUP:
+                    if event.button == 1:
+                        pos = pygame.mouse.get_pos()
+                        if ram_map_x != -1:
+                            ecart_map_x = pos[0]-ram_map_x
+                            pos_max = 600 - sidebar_map_x_size
+                            pos_min = 0
+                            new_pos = sidebar_map_x + ecart_map_x
+                            sidebar_map_x = min(max(pos_min, new_pos), pos_max)
+                            ram_map_x = -1
+                            ecart_map_x = 0
+
+                        if ram_map_y != -1:
+                            ecart_map_y = pos[1]-ram_map_y
+                            pos_max = 600 - sidebar_map_y_size
+                            pos_min = 0
+                            new_pos = sidebar_map_y + ecart_map_y
+                            sidebar_map_y = min(max(pos_min, new_pos), pos_max)
+                            ram_map_y = -1
+                            ecart_map_y = 0
+
+                        if ram_tileset_x != -1:
+                            ecart_tileset_x = pos[0]-ram_tileset_x
+                            pos_max = 400 - sidebar_tileset_x_size
+                            pos_min = 0
+                            new_pos = sidebar_tileset_x + ecart_tileset_x
+                            sidebar_tileset_x = min(max(pos_min, new_pos), pos_max)
+                            ram_tileset_x = -1
+                            ecart_tileset_x = 0
+
+                        if ram_tileset_y != -1:
+                            ecart_tileset_y = pos[1]-ram_tileset_y
+                            pos_max = 600 - sidebar_tileset_y_size
+                            pos_min = 0
+                            new_pos = sidebar_tileset_y + ecart_tileset_y
+                            sidebar_tileset_y = min(max(pos_min, new_pos), pos_max)
+                            ram_tileset_y = -1
+                            ecart_tileset_y = 0
+
+            if ram_map_x != -1:
+                pos = pygame.mouse.get_pos()
+                ecart_map_x = pos[0]-ram_map_x
+                if sidebar_map_x == 600-sidebar_map_x_size:
+                    pos_max = 0
+                    pos_min = sidebar_map_x_size - 600
+                elif sidebar_map_x == 0:
+                    pos_max = 600 - sidebar_map_x_size
+                    pos_min = 0
+                else:
+                    pos_max = 600 - sidebar_map_x_size-sidebar_map_x
+                    pos_min = -sidebar_map_x
+                ecart_map_x = min(max(pos_min, ecart_map_x), pos_max)
+
+            if ram_map_y != -1:
+                pos = pygame.mouse.get_pos()
+                ecart_map_y = pos[1]-ram_map_y
+                if sidebar_map_y == 600-sidebar_map_y_size:
+                    pos_max = 0
+                    pos_min = sidebar_map_y_size - 600
+                elif sidebar_map_x == 0:
+                    pos_max = 600 - sidebar_map_y_size
+                    pos_min = 0
+                else:
+                    pos_max = 600 - sidebar_map_y_size-sidebar_map_y
+                    pos_min = -sidebar_map_y
+                ecart_map_y = min(max(pos_min, ecart_map_y), pos_max)
+
+            if ram_tileset_x != -1:
+                pos = pygame.mouse.get_pos()
+                ecart_tileset_x = pos[0]-ram_tileset_x
+                if sidebar_tileset_x == 400-sidebar_tileset_x_size:
+                    pos_max = 0
+                    pos_min = sidebar_tileset_x_size - 400
+                elif sidebar_tileset_x == 0:
+                    pos_max = 400 - sidebar_tileset_x_size
+                    pos_min = 0
+                else:
+                    pos_max = 400 - sidebar_tileset_x_size-sidebar_tileset_x
+                    pos_min = -sidebar_tileset_x
+                ecart_tileset_x = min(max(pos_min, ecart_tileset_x), pos_max)
+
+            if ram_tileset_y != -1:
+                pos = pygame.mouse.get_pos()
+                ecart_tileset_y = pos[1]-ram_tileset_y
+                if sidebar_tileset_y == 600-sidebar_tileset_y_size:
+                    pos_max = 0
+                    pos_min = sidebar_tileset_y_size - 600
+                elif sidebar_tileset_y == 0:
+                    pos_max = 600 - sidebar_tileset_y_size
+                    pos_min = 0
+                else:
+                    pos_max = 600 - sidebar_tileset_y_size-sidebar_tileset_y
+                    pos_min = -sidebar_tileset_y
+                ecart_tileset_y = min(max(pos_min, ecart_tileset_y), pos_max)
+
+            display.fill((255, 255, 255))
 
             layouts = self.current_map.get_surfaces()
-            surface_map.blit(layouts[0], camera_map)
+            surface_map.fill((255, 255, 255))
+            surface_map.blit(layouts[0], (-(sidebar_map_x+ecart_map_x)*(16*self.current_map.size[0]) / 600, -(sidebar_map_y+ecart_map_y)*(16*self.current_map.size[1]) / 600))
             if self.see_layout == 2:
                 surface = pygame.Surface((self.current_map.size[0]*16, self.current_map.size[1]*16), HWSURFACE | SRCALPHA)
                 surface.fill((0, 0, 0, 100))
-                surface_map.blit(surface, camera_map)
-                surface_map.blit(layouts[1], camera_map)
+                surface_map.blit(surface, (-(sidebar_map_x+ecart_map_x)*(16*self.current_map.size[0]) / 600, -(sidebar_map_y+ecart_map_y)*(16*self.current_map.size[1]) / 600))
+                surface_map.blit(layouts[1], (-(sidebar_map_x+ecart_map_x)*(16*self.current_map.size[0]) / 600, -(sidebar_map_y+ecart_map_y)*(16*self.current_map.size[1]) / 600))
 
             if self.see_layout == 3:
-                surface_map.blit(layouts[1], camera_map)
+                surface_map.blit(layouts[1], (-(sidebar_map_x+ecart_map_x)*(16*self.current_map.size[0]) / 600, -(sidebar_map_y+ecart_map_y)*(16*self.current_map.size[1]) / 600))
                 surface = pygame.Surface((self.current_map.size[0]*16, self.current_map.size[1]*16), HWSURFACE | SRCALPHA)
                 surface.fill((0, 0, 0, 100))
-                surface_map.blit(surface, camera_map)
-                surface_map.blit(layouts[2], camera_map)
+                surface_map.blit(surface, (-(sidebar_map_x+ecart_map_x)*(16*self.current_map.size[0]) / 600, -(sidebar_map_y+ecart_map_y)*(16*self.current_map.size[1]) / 600))
+                surface_map.blit(layouts[2], (-(sidebar_map_x+ecart_map_x)*(16*self.current_map.size[0]) / 600, -(sidebar_map_y+ecart_map_y)*(16*self.current_map.size[1]) / 600))
 
             y = 0
+            surface_tileset.fill((255, 255, 255))
 
-            for name in self.current_map.tilesets_names:
-                tiles_file = "Assets\\tilesets\\{}.png".format(name)
-                tiles = pygame.image.load(tiles_file).convert_alpha()
-                surface_tileset.blit(tiles, (0, y))
-                y += tiles.get_size()[1]
+            for tile in tilesets:
+                surface_tileset.blit(tile, (-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, -(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 400))
+                y += tile.get_size()[1]
 
             display.blit(surface_bar, (0, 0))
             display.blit(surface_map, (0, 100))
-            display.blit(surface_tileset, (600, 100))
+            display.blit(surface_tileset, (616, 100))
+
+            pygame.draw.rect(display, (255, 255, 255), (0, 700, 600, 16))
+            pygame.draw.rect(display, (255, 255, 255), (616, 700, 400, 16))
+            pygame.draw.rect(display, (0, 0, 0), (sidebar_map_x+ecart_map_x, 700, sidebar_map_x_size, 16))
+            pygame.draw.rect(display, (0, 0, 0), (616+sidebar_tileset_x+ecart_tileset_x, 700, sidebar_tileset_x_size, 16))
+
+            pygame.draw.rect(display, (255, 255, 255), (600, 100, 16, 600))
+            pygame.draw.rect(display, (255, 255, 255), (1016, 100, 16, 600))
+            pygame.draw.rect(display, (0, 0, 0), (600, 100+sidebar_map_y+ecart_map_y, 16, sidebar_map_y_size))
+            pygame.draw.rect(display, (0, 0, 0), (1016, 100+sidebar_tileset_y+ecart_tileset_y, 16, sidebar_tileset_y_size))
+
             pygame.display.flip()
 
 app = App()
