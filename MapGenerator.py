@@ -238,10 +238,10 @@ class App:
         sidebar_map_y = 0
         sidebar_tileset_x = 0
         sidebar_tileset_y = 0
-        sidebar_map_x_size = 600**2 / (16*self.current_map.size[0])
-        sidebar_tileset_x_size = 400**2 / tileset_size_x
-        sidebar_map_y_size = 600**2 / (16*self.current_map.size[1])
-        sidebar_tileset_y_size = 600**2 / tileset_size_y
+        sidebar_map_x_size = min(600, 600**2 / (16*self.current_map.size[0]))
+        sidebar_tileset_x_size = min(400, 400**2 / tileset_size_x)
+        sidebar_map_y_size = min(600, 600**2 / (16*self.current_map.size[1]))
+        sidebar_tileset_y_size = min(600, 600**2 / tileset_size_y)
         ram_map_x = -1
         ram_map_y = -1
         ram_tileset_x = -1
