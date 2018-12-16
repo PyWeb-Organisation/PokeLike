@@ -139,7 +139,8 @@ class App:
     """
     def __init__(self):
         self.current_map = Map([0, 0], [])
-        self.see_layout = 1
+        self.see_layout = 3
+        self.tool = "pencil"
 
     def add_tileset_to_map(self):
         path = fd.askopenfilename()
@@ -250,6 +251,11 @@ class App:
         ecart_map_y = 0
         ecart_tileset_x = 0
         ecart_tileset_y = 0
+
+        pencil_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+
+        cursor = pygame.Surface((16, 16), HWSURFACE | SRCALPHA)
+        pygame.draw.rect(cursor, (150, 175, 0), (0, 0, 16, 16), 2)
 
         while running:
             for event in pygame.event.get():
@@ -366,6 +372,8 @@ class App:
                     pos_min = -sidebar_tileset_y
                 ecart_tileset_y = min(max(pos_min, ecart_tileset_y), pos_max)
 
+            mouse_pos = pygame.mouse.get_pos()
+
             display.fill((255, 255, 255))
 
             layouts = self.current_map.get_surfaces()
@@ -388,12 +396,27 @@ class App:
             surface_tileset.fill((255, 255, 255))
 
             for tile in tilesets:
-                surface_tileset.blit(tile, (-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, -(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 400))
+                surface_tileset.blit(tile, (-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, -(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 600))
                 y += tile.get_size()[1]
 
             display.blit(surface_bar, (0, 0))
             display.blit(surface_map, (0, 100))
             display.blit(surface_tileset, (616, 100))
+
+            # Drawing Cursor
+            if 0 <= mouse_pos[0] <= 600 and 100 <= mouse_pos[1] <= 700:
+                real_pos_x = sidebar_map_x*(16*self.current_map.size[0]) / 600 + mouse_pos[0]
+                real_pos_y = sidebar_map_y*(16*self.current_map.size[1]) / 600 + mouse_pos[1]
+                x = (real_pos_x // 16) * 16 - sidebar_map_x*(16*self.current_map.size[0]) / 600
+                y = 100 + ((real_pos_y-100) // 16) * 16 - sidebar_map_y*(16*self.current_map.size[1]) / 600
+                display.blit(cursor, (x, y))
+
+            if 616 <= mouse_pos[0] <= 1016 and 100 <= mouse_pos[1] <= 700:
+                real_pos_x = sidebar_tileset_x*tileset_size_x / 400 + mouse_pos[0]
+                real_pos_y = sidebar_tileset_y*tileset_size_y / 600 + mouse_pos[1]
+                x = 616 + ((real_pos_x-616) // 16) * 16 - sidebar_tileset_x*tileset_size_x / 400
+                y = 100 + ((real_pos_y-100) // 16) * 16 - sidebar_tileset_y*tileset_size_y / 600
+                display.blit(cursor, (x, y))
 
             pygame.draw.rect(display, (255, 255, 255), (0, 700, 600, 16))
             pygame.draw.rect(display, (255, 255, 255), (616, 700, 400, 16))
