@@ -15,7 +15,7 @@ import tkinter
 import os
 import sys
 
-pygame.display.init()
+pygame.init()
 display = pygame.display.set_mode((1032, 716))
 
 # Création des variables globales du script :
@@ -27,25 +27,25 @@ inutile.overrideredirect(True)
 # Création des fonctions du script :
 def save_map(size, tilesets, layouts, filename):
     with open(filename, "w") as file:
-        file.write("size : {}\n".format(size.join(", ")))
+        file.write("size : {}\n".format(", ".join([str(item) for item in size])))
 
         for tileset in tilesets:
             file.write("tileset : {}\n".format(tileset))
 
-        file.write("[Layout1]")
+        file.write("[Layout1]\n")
         for line in layouts[0]:
-            file.write("{}\n".format(line.join(" ")))
-        file.write("[/Layout1]")
+            file.write("{}\n".format(" ".join([str(item) for item in line])))
+        file.write("[/Layout1]\n")
 
-        file.write("[Layout2]")
+        file.write("[Layout2]\n")
         for line in layouts[1]:
-            file.write("{}\n".format(line.join(" ")))
-        file.write("[/Layout2]")
+            file.write("{}\n".format(" ".join([str(item) for item in line])))
+        file.write("[/Layout2]\n")
 
-        file.write("[Layout3]")
+        file.write("[Layout3]\n")
         for line in layouts[2]:
-            file.write("{}\n".format(line.join(" ")))
-        file.write("[/Layout3]")
+            file.write("{}\n".format(" ".join([str(item) for item in line])))
+        file.write("[/Layout3]\n")
         file.close()
 
 def create_new_map():
@@ -59,13 +59,13 @@ def create_new_map():
     def get_size():
         global sizes
         sizes = [int(entry1.get()), int(entry2.get())]
-        f.destroy()
+        f.quit()
     button = tkinter.Button(f, text="Valider", command=get_size)
     entry1.grid(row=0, column=0)
     entry2.grid(row=1, column=0)
     button.grid(row=1, column=1)
     f.mainloop()
-    return Map(sizes, [])
+    return Map(sizes, [TileSet("main_tile_set")])
 
 class TileSet:
     """
@@ -99,6 +99,7 @@ class Map:
     Map prévu pour le jeu [PokéLike]
     """
     def __init__(self, size, tilesets):
+        print("loading new map")
         self.size = size
         self.tilesets_names = []
         self.tileset = []
@@ -138,7 +139,7 @@ class App:
     Prcesseur logique de l'application
     """
     def __init__(self):
-        self.current_map = Map([0, 0], [])
+        self.current_map = Map([21, 21], [TileSet("main_tile_set")])
         self.see_layout = 3
         self.tool = "pencil"
 
@@ -151,6 +152,11 @@ class App:
     def create_map(self):
         self.current_map = create_new_map()
 
+    def save_current_map(self):
+        path = fd.asksaveasfilename()
+        if not path == '':
+            save_map(self.current_map.size, self.current_map.tilesets_names, self.current_map.layouts, path)
+
     def open_map(self):
         path = fd.askopenfilename()
         tilesets = []
@@ -161,67 +167,70 @@ class App:
         layout3 = False
         current_layout = []
 
-        with open(path, 'r') as file:
-            for line in file:
-                line = line[:-1]
-                if not line == "" and not layout1 and not layout2 and not layout3:
-                    if line == "[Layout1]":
-                        layout1 = True
+        if not path == '':
 
-                    elif line == "[Layout2]":
-                        layout2 = True
+            with open(path, 'r') as file:
+                for line in file:
+                    line = line[:-1]
+                    if not line == "" and not layout1 and not layout2 and not layout3:
+                        if line == "[Layout1]":
+                            layout1 = True
 
-                    elif line == "[Layout3]":
-                        layout3 = True
+                        elif line == "[Layout2]":
+                            layout2 = True
 
-                    else:
-                        variable, content = line.split(" : ")
-                        if variable == "size":
-                            size = [int(value) for value in content.split(", ")]
-
-                        elif variable == "tileset":
-                            tilesets.append(TileSet(content))
+                        elif line == "[Layout3]":
+                            layout3 = True
 
                         else:
-                            pass
+                            variable, content = line.split(" : ")
+                            if variable == "size":
+                                size = [int(value) for value in content.split(", ")]
 
-                elif layout1:
-                    if line == "[/Layout1]":
-                        layout1 = False
-                        layouts[0] = current_layout
-                        current_layout = []
+                            elif variable == "tileset":
+                                tilesets.append(TileSet(content))
 
-                    elif not line == "[Layout1]":
-                        current_layout.append([int(value) for value in line.split(" ")])
+                            else:
+                                pass
 
-                elif layout2:
-                    if line == "[/Layout2]":
-                        layout2 = False
-                        layouts[1] = current_layout
-                        current_layout = []
+                    elif layout1:
+                        if line == "[/Layout1]":
+                            layout1 = False
+                            layouts[0] = current_layout
+                            current_layout = []
 
-                    elif not line == "[Layout2]":
-                        current_layout.append([int(value) for value in line.split(" ")])
+                        elif not line == "[Layout1]":
+                            current_layout.append([int(value) for value in line.split(" ")])
 
-                elif layout3:
-                    if line == "[/Layout3]":
-                        layout3 = False
-                        layouts[2] = current_layout
-                        current_layout = []
+                    elif layout2:
+                        if line == "[/Layout2]":
+                            layout2 = False
+                            layouts[1] = current_layout
+                            current_layout = []
 
-                    elif not line == "[Layout3]":
-                        current_layout.append([int(value) for value in line.split(" ")])
+                        elif not line == "[Layout2]":
+                            current_layout.append([int(value) for value in line.split(" ")])
 
-                else:
-                    pass
+                    elif layout3:
+                        if line == "[/Layout3]":
+                            layout3 = False
+                            layouts[2] = current_layout
+                            current_layout = []
 
-            file.close()
+                        elif not line == "[Layout3]":
+                            current_layout.append([int(value) for value in line.split(" ")])
 
-        self.current_map = Map(size, tilesets)
-        self.current_map.layouts = layouts
+                    else:
+                        pass
+
+                file.close()
+
+            self.current_map = Map(size, tilesets)
+            self.current_map.layouts = layouts
 
     def run(self):
         running = True
+        font = pygame.font.SysFont("Arial", 16, bold=True)
         surface_bar = pygame.Surface((1000, 100), HWSURFACE | SRCALPHA)
         surface_map = pygame.Surface((600, 600), HWSURFACE | SRCALPHA)
         surface_tileset = pygame.Surface((400, 600), HWSURFACE | SRCALPHA)
@@ -253,6 +262,40 @@ class App:
         ecart_tileset_y = 0
 
         pencil_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        square_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        filler_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        pencil_button.fill((200, 200, 200))
+        square_button.fill((200, 200, 200))
+        filler_button.fill((200, 200, 200))
+
+        layout1_button = pygame.Surface((100, 50), HWSURFACE | SRCALPHA)
+        layout2_button = pygame.Surface((100, 50), HWSURFACE | SRCALPHA)
+        layout3_button = pygame.Surface((100, 50), HWSURFACE | SRCALPHA)
+        layout1_button.fill((150, 100, 50))
+        layout2_button.fill((255, 0, 0))
+        layout3_button.fill((100, 200, 255))
+        text_1 = font.render("Sol", True, (255, 255, 255))
+        text_1_rect = text_1.get_rect(center=(50, 25))
+        layout1_button.blit(text_1, text_1_rect)
+        text_2 = font.render("Objets", True, (255, 255, 255))
+        text_2_rect = text_2.get_rect(center=(50, 25))
+        layout2_button.blit(text_2, text_2_rect)
+        text_3 = font.render("Ciel", True, (255, 255, 255))
+        text_3_rect = text_3.get_rect(center=(50, 25))
+        layout3_button.blit(text_3, text_3_rect)
+
+        save_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        load_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        load_tileset_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        create_new_button = pygame.Surface((50, 50), HWSURFACE | SRCALPHA)
+        save_button.fill((220, 220, 220))
+        load_button.fill((220, 220, 220))
+        load_tileset_button.fill((220, 220, 220))
+        create_new_button.fill((220, 220, 220))
+        pygame.draw.rect(save_button, (0, 0, 0), (0, 0, 50, 50), 1)
+        pygame.draw.rect(load_button, (0, 0, 0), (0, 0, 50, 50), 1)
+        pygame.draw.rect(load_tileset_button, (0, 0, 0), (0, 0, 50, 50), 1)
+        pygame.draw.rect(create_new_button, (0, 0, 0), (0, 0, 50, 50), 1)
 
         cursor = pygame.Surface((16, 16), HWSURFACE | SRCALPHA)
         pygame.draw.rect(cursor, (150, 175, 0), (0, 0, 16, 16), 2)
@@ -276,6 +319,114 @@ class App:
 
                         if 1016 <= pos[0] <= 1032 and 100+sidebar_tileset_y <= pos[1] <= 100+sidebar_tileset_y+sidebar_tileset_y_size:
                             ram_tileset_y = pos[1]
+
+                        if 732 <= pos[0] <= 832 and 50 <= pos[1] <= 100:
+                            self.see_layout = 1
+
+                        if 832 <= pos[0] <= 932 and 50 <= pos[1] <= 100:
+                            self.see_layout = 2
+
+                        if 932 <= pos[0] <= 1032 and 50 <= pos[1] <= 100:
+                            self.see_layout = 3
+
+                        if 0 <= pos[0] <= 50 and 50 <= pos[1] <= 100:
+                            self.tool = "pencil"
+
+                        if 50 <= pos[0] <= 100 and 50 <= pos[1] <= 100:
+                            self.tool = "square"
+
+                        if 100 <= pos[0] <= 150 and 50 <= pos[1] <= 100:
+                            self.tool = "filler"
+
+                        if 0 <= pos[0] <= 50 and 0 <= pos[1] <= 50:
+                            self.save_current_map()
+
+                        if 50 <= pos[0] <= 100 and 0 <= pos[1] <= 50:
+                            self.open_map()
+                            tilesets = []
+                            tileset_size_y = 0
+                            tileset_size_x = 0
+                            for name in self.current_map.tilesets_names:
+                                tiles_file = "Assets\\tilesets\\{}.png".format(name)
+                                tiles = pygame.image.load(tiles_file).convert_alpha()
+                                size = tiles.get_size()
+                                tileset_size_y += size[1]
+                                tileset_size_x = max(tileset_size_x, size[0])
+                                tilesets.append(tiles)
+                            sidebar_map_x = 0
+                            sidebar_map_y = 0
+                            sidebar_tileset_x = 0
+                            sidebar_tileset_y = 0
+                            sidebar_map_x_size = min(600, 600**2 / (16*self.current_map.size[0]))
+                            sidebar_tileset_x_size = min(400, 400**2 / tileset_size_x)
+                            sidebar_map_y_size = min(600, 600**2 / (16*self.current_map.size[1]))
+                            sidebar_tileset_y_size = min(600, 600**2 / tileset_size_y)
+                            ram_map_x = -1
+                            ram_map_y = -1
+                            ram_tileset_x = -1
+                            ram_tileset_y = -1
+                            ecart_map_x = 0
+                            ecart_map_y = 0
+                            ecart_tileset_x = 0
+                            ecart_tileset_y = 0
+
+                        if 100 <= pos[0] <= 150 and 0 <= pos[1] <= 50:
+                            self.add_tileset_to_map()
+                            tilesets = []
+                            tileset_size_y = 0
+                            tileset_size_x = 0
+                            for name in self.current_map.tilesets_names:
+                                tiles_file = "Assets\\tilesets\\{}.png".format(name)
+                                tiles = pygame.image.load(tiles_file).convert_alpha()
+                                size = tiles.get_size()
+                                tileset_size_y += size[1]
+                                tileset_size_x = max(tileset_size_x, size[0])
+                                tilesets.append(tiles)
+                            sidebar_map_x = 0
+                            sidebar_map_y = 0
+                            sidebar_tileset_x = 0
+                            sidebar_tileset_y = 0
+                            sidebar_map_x_size = min(600, 600**2 / (16*self.current_map.size[0]))
+                            sidebar_tileset_x_size = min(400, 400**2 / tileset_size_x)
+                            sidebar_map_y_size = min(600, 600**2 / (16*self.current_map.size[1]))
+                            sidebar_tileset_y_size = min(600, 600**2 / tileset_size_y)
+                            ram_map_x = -1
+                            ram_map_y = -1
+                            ram_tileset_x = -1
+                            ram_tileset_y = -1
+                            ecart_map_x = 0
+                            ecart_map_y = 0
+                            ecart_tileset_x = 0
+                            ecart_tileset_y = 0
+
+                        if 150 <= pos[0] <= 200 and 0 <= pos[1] <= 50:
+                            self.create_map()
+                            tilesets = []
+                            tileset_size_y = 0
+                            tileset_size_x = 0
+                            for name in self.current_map.tilesets_names:
+                                tiles_file = "Assets\\tilesets\\{}.png".format(name)
+                                tiles = pygame.image.load(tiles_file).convert_alpha()
+                                size = tiles.get_size()
+                                tileset_size_y += size[1]
+                                tileset_size_x = max(tileset_size_x, size[0])
+                                tilesets.append(tiles)
+                            sidebar_map_x = 0
+                            sidebar_map_y = 0
+                            sidebar_tileset_x = 0
+                            sidebar_tileset_y = 0
+                            sidebar_map_x_size = min(600, 600**2 / (16*self.current_map.size[0]))
+                            sidebar_tileset_x_size = min(400, 400**2 / tileset_size_x)
+                            sidebar_map_y_size = min(600, 600**2 / (16*self.current_map.size[1]))
+                            sidebar_tileset_y_size = min(600, 600**2 / tileset_size_y)
+                            ram_map_x = -1
+                            ram_map_y = -1
+                            ram_tileset_x = -1
+                            ram_tileset_y = -1
+                            ecart_map_x = 0
+                            ecart_map_y = 0
+                            ecart_tileset_x = 0
+                            ecart_tileset_y = 0
 
                 elif event.type == MOUSEBUTTONUP:
                     if event.button == 1:
@@ -396,7 +547,7 @@ class App:
             surface_tileset.fill((255, 255, 255))
 
             for tile in tilesets:
-                surface_tileset.blit(tile, (-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, -(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 600))
+                surface_tileset.blit(tile, (-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, y-(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 600))
                 y += tile.get_size()[1]
 
             display.blit(surface_bar, (0, 0))
@@ -428,8 +579,30 @@ class App:
             pygame.draw.rect(display, (0, 0, 0), (600, 100+sidebar_map_y+ecart_map_y, 16, sidebar_map_y_size))
             pygame.draw.rect(display, (0, 0, 0), (1016, 100+sidebar_tileset_y+ecart_tileset_y, 16, sidebar_tileset_y_size))
 
+            display.blit(layout1_button, (732, 50))
+            display.blit(layout2_button, (832, 50))
+            display.blit(layout3_button, (932, 50))
+            pygame.draw.rect(display, (0, 0, 0), (732+100*(self.see_layout-1), 50, 99, 49), 2)
+
+            display.blit(pencil_button, (0, 50))
+            display.blit(square_button, (50, 50))
+            display.blit(filler_button, (100, 50))
+            if self.tool == "pencil":
+                pygame.draw.rect(display, (0, 0, 0), (0, 50, 49, 49), 2)
+
+            if self.tool == "square":
+                pygame.draw.rect(display, (0, 0, 0), (50, 50, 49, 49), 2)
+
+            if self.tool == "filler":
+                pygame.draw.rect(display, (0, 0, 0), (100, 50, 49, 49), 2)
+
+            display.blit(save_button, (0, 0))
+            display.blit(load_button, (50, 0))
+            display.blit(load_tileset_button, (100, 0))
+            display.blit(create_new_button, (150, 0))
+
             pygame.display.flip()
 
 app = App()
-app.open_map()
+#app.open_map()
 app.run()
