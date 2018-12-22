@@ -140,8 +140,9 @@ class App:
     """
     def __init__(self):
         self.current_map = Map([21, 21], [TileSet("main_tile_set")])
-        self.see_layout = 3
+        self.see_layout = 1
         self.tool = "pencil"
+        self.selected_tile = 0
 
     def add_tileset_to_map(self):
         path = fd.askopenfilename()
@@ -230,7 +231,7 @@ class App:
 
     def run(self):
         running = True
-        font = pygame.font.SysFont("Arial", 16, bold=True)
+        font = pygame.font.SysFont("Arial", 8, bold=True)
         surface_bar = pygame.Surface((1000, 100), HWSURFACE | SRCALPHA)
         surface_map = pygame.Surface((600, 600), HWSURFACE | SRCALPHA)
         surface_tileset = pygame.Surface((400, 600), HWSURFACE | SRCALPHA)
@@ -267,6 +268,10 @@ class App:
         pencil_button.fill((200, 200, 200))
         square_button.fill((200, 200, 200))
         filler_button.fill((200, 200, 200))
+        pygame.draw.rect(pencil_button, (0, 0, 0), (20, 10, 10, 30))
+        pygame.draw.rect(pencil_button, (0, 0, 0), (10, 20, 30, 10))
+        pygame.draw.rect(square_button, (0, 0, 0), (10, 10, 30, 30))
+        pygame.draw.circle(filler_button, (0, 0, 0), (25, 25), 15)
 
         layout1_button = pygame.Surface((100, 50), HWSURFACE | SRCALPHA)
         layout2_button = pygame.Surface((100, 50), HWSURFACE | SRCALPHA)
@@ -296,9 +301,25 @@ class App:
         pygame.draw.rect(load_button, (0, 0, 0), (0, 0, 50, 50), 1)
         pygame.draw.rect(load_tileset_button, (0, 0, 0), (0, 0, 50, 50), 1)
         pygame.draw.rect(create_new_button, (0, 0, 0), (0, 0, 50, 50), 1)
+        text = font.render("Save", True, (0, 0, 0))
+        text_rect = text.get_rect(center=(25, 25))
+        save_button.blit(text, text_rect)
+        text = font.render("Load map", True, (0, 0, 0))
+        text_rect = text.get_rect(center=(25, 25))
+        load_button.blit(text, text_rect)
+        text = font.render("Load tileset", True, (0, 0, 0))
+        text_rect = text.get_rect(center=(25, 25))
+        load_tileset_button.blit(text, text_rect)
+        text = font.render("Create new", True, (0, 0, 0))
+        text_rect = text.get_rect(center=(25, 25))
+        create_new_button.blit(text, text_rect)
 
         cursor = pygame.Surface((16, 16), HWSURFACE | SRCALPHA)
-        pygame.draw.rect(cursor, (150, 175, 0), (0, 0, 16, 16), 2)
+        pygame.draw.rect(cursor, (150, 175, 0), (0, 0, 15, 15), 2)
+
+        click_map = False
+        click_map_pos = [-1, -1]
+        ram_click_map = [-1, -1]
 
         while running:
             for event in pygame.event.get():
@@ -428,6 +449,17 @@ class App:
                             ecart_tileset_x = 0
                             ecart_tileset_y = 0
 
+                        if 616 <= pos[0] <= 1016 and 100 <= pos[1] <= 700:
+                            real_pos_x = sidebar_tileset_x*tileset_size_x / 400 + pos[0] - 616
+                            real_pos_y = sidebar_tileset_y*tileset_size_y / 600 + pos[1] - 100
+                            x = (real_pos_x) // 16
+                            y = (real_pos_y) // 16
+                            self.selected_tile = y * (tileset_size_x//16) + x
+
+                        if 0 <= pos[0] <= 600 and 100 <= pos[1] <= 700:
+                            click_map = True
+                            click_map_pos = pos
+
                 elif event.type == MOUSEBUTTONUP:
                     if event.button == 1:
                         pos = pygame.mouse.get_pos()
@@ -466,6 +498,36 @@ class App:
                             sidebar_tileset_y = min(max(pos_min, new_pos), pos_max)
                             ram_tileset_y = -1
                             ecart_tileset_y = 0
+
+                        if click_map:
+                            click_map = False
+                            ram_click_map = pos
+
+            if click_map and self.tool == "pencil":
+                try:
+                    mouse_pos = pygame.mouse.get_pos()
+                    real_pos_x = sidebar_map_x*(16*self.current_map.size[0]) / 600 + mouse_pos[0]
+                    real_pos_y = sidebar_map_y*(16*self.current_map.size[1]) / 600 + mouse_pos[1]
+                    x = int(real_pos_x // 16)
+                    y = int((real_pos_y-100) // 16)
+                    self.current_map.layouts[self.see_layout-1][y][x] = int(self.selected_tile)
+                except:
+                    pass
+
+            if self.tool == "square" and ram_click_map != [-1, -1]:
+                real_pos_x_1 = min(16*self.current_map.size[0], sidebar_map_x*(16*self.current_map.size[0]) / 600 + click_map_pos[0])
+                real_pos_y_1 = min(16*self.current_map.size[1]+100, sidebar_map_y*(16*self.current_map.size[1]) / 600 + click_map_pos[1])
+                real_pos_x_2 = min(16*self.current_map.size[0], sidebar_map_x*(16*self.current_map.size[0]) / 600 + ram_click_map[0])
+                real_pos_y_2 = min(16*self.current_map.size[1]+100, sidebar_map_y*(16*self.current_map.size[1]) / 600 + ram_click_map[1])
+                ram_click_map = [-1, -1]
+                click_map_pos = [-1, -1]
+                x1 = int(real_pos_x_1 // 16)
+                y1 = int((real_pos_y_1-100) // 16)
+                x2 = int(real_pos_x_2 // 16)
+                y2 = int((real_pos_y_2-100) // 16)
+                for i in range(abs(x2-x1)):
+                    for j in range(abs(y2-y1)):
+                        self.current_map.layouts[self.see_layout-1][min(y1, y2)+j][min(x1, x2)+i] = int(self.selected_tile)
 
             if ram_map_x != -1:
                 pos = pygame.mouse.get_pos()
@@ -550,17 +612,38 @@ class App:
                 surface_tileset.blit(tile, (-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, y-(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 600))
                 y += tile.get_size()[1]
 
+            pygame.draw.rect(surface_tileset, (150, 0, 125), ((self.selected_tile%(tileset_size_x//16))*16-(sidebar_tileset_x+ecart_tileset_x)*tileset_size_x / 400, (self.selected_tile//(tileset_size_x//16))*16-(sidebar_tileset_y+ecart_tileset_y)*tileset_size_y / 600, 15, 15), 2)
+
             display.blit(surface_bar, (0, 0))
             display.blit(surface_map, (0, 100))
             display.blit(surface_tileset, (616, 100))
 
             # Drawing Cursor
             if 0 <= mouse_pos[0] <= 600 and 100 <= mouse_pos[1] <= 700:
-                real_pos_x = sidebar_map_x*(16*self.current_map.size[0]) / 600 + mouse_pos[0]
-                real_pos_y = sidebar_map_y*(16*self.current_map.size[1]) / 600 + mouse_pos[1]
-                x = (real_pos_x // 16) * 16 - sidebar_map_x*(16*self.current_map.size[0]) / 600
-                y = 100 + ((real_pos_y-100) // 16) * 16 - sidebar_map_y*(16*self.current_map.size[1]) / 600
-                display.blit(cursor, (x, y))
+                if click_map_pos == [-1, -1]:
+                    real_pos_x = sidebar_map_x*(16*self.current_map.size[0]) / 600 + mouse_pos[0]
+                    real_pos_y = sidebar_map_y*(16*self.current_map.size[1]) / 600 + mouse_pos[1]
+                    x = (real_pos_x // 16) * 16 - sidebar_map_x*(16*self.current_map.size[0]) / 600
+                    y = 100 + ((real_pos_y-100) // 16) * 16 - sidebar_map_y*(16*self.current_map.size[1]) / 600
+                    display.blit(cursor, (x, y))
+
+                elif self.tool == "square":
+                    mouse_pos = pygame.mouse.get_pos()
+                    real_pos_x_1 = min(16*self.current_map.size[0], sidebar_map_x*(16*self.current_map.size[0]) / 600 + click_map_pos[0])
+                    real_pos_y_1 = min(16*self.current_map.size[1]+100, sidebar_map_y*(16*self.current_map.size[1]) / 600 + click_map_pos[1])
+                    real_pos_x_2 = min(16*self.current_map.size[0], sidebar_map_x*(16*self.current_map.size[0]) / 600 + mouse_pos[0])
+                    real_pos_y_2 = min(16*self.current_map.size[1]+100, sidebar_map_y*(16*self.current_map.size[1]) / 600 + mouse_pos[1])
+                    x1 = (real_pos_x_1 // 16) * 16 - sidebar_map_x*(16*self.current_map.size[0]) / 600
+                    y1 = 100 + ((real_pos_y_1-100) // 16) * 16 - sidebar_map_y*(16*self.current_map.size[1]) / 600
+                    x2 = (real_pos_x_2 // 16) * 16 - sidebar_map_x*(16*self.current_map.size[0]) / 600
+                    y2 = 100 + ((real_pos_y_2-100) // 16) * 16 - sidebar_map_y*(16*self.current_map.size[1]) / 600
+                    x = min(x1, x2)
+                    y = min(y1, y2)
+                    rect_x = abs(x1-x2)
+                    rect_y = abs(y1-y2)
+                    print(rect_y, y1, y2)
+                    pygame.draw.rect(display, (150, 175, 0), (x, y, rect_x-1, rect_y-1), 2)
+
 
             if 616 <= mouse_pos[0] <= 1016 and 100 <= mouse_pos[1] <= 700:
                 real_pos_x = sidebar_tileset_x*tileset_size_x / 400 + mouse_pos[0]
