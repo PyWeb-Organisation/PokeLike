@@ -158,6 +158,28 @@ class App:
         if not path == '':
             save_map(self.current_map.size, self.current_map.tilesets_names, self.current_map.layouts, path)
 
+    def filler(self, pos, old_tile, new_tile):
+        if old_tile == new_tile:
+            return
+        if self.current_map.layouts[self.see_layout-1][pos[1]][pos[0]] == old_tile:
+            self.current_map.layouts[self.see_layout-1][pos[1]][pos[0]] = new_tile
+            try:
+                self.filler([pos[0], pos[1]-1], old_tile, new_tile)
+            except:
+                pass
+            try:
+                self.filler([pos[0], pos[1]+1], old_tile, new_tile)
+            except:
+                pass
+            try:
+                self.filler([pos[0]-1, pos[1]], old_tile, new_tile)
+            except:
+                pass
+            try:
+                self.filler([pos[0]+1, pos[1]], old_tile, new_tile)
+            except:
+                pass
+
     def open_map(self):
         path = fd.askopenfilename()
         tilesets = []
@@ -459,6 +481,16 @@ class App:
                         if 0 <= pos[0] <= 600 and 100 <= pos[1] <= 700:
                             click_map = True
                             click_map_pos = pos
+                            if self.tool == "filler":
+                                try:
+                                    mouse_pos = pygame.mouse.get_pos()
+                                    real_pos_x = sidebar_map_x*(16*self.current_map.size[0]) / 600 + mouse_pos[0]
+                                    real_pos_y = sidebar_map_y*(16*self.current_map.size[1]) / 600 + mouse_pos[1]
+                                    x = int(real_pos_x // 16)
+                                    y = int((real_pos_y-100) // 16)
+                                    self.filler((x, y), self.current_map.layouts[self.see_layout-1][y][x], int(self.selected_tile))
+                                except:
+                                    pass
 
                 elif event.type == MOUSEBUTTONUP:
                     if event.button == 1:
