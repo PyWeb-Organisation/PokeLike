@@ -1,0 +1,16 @@
+# Tileset data file of the game PokéLike
+
+<Tileset>
+Name:Main_tileset
+Id:0
+Size:48
+Pictures:["Fluss_A1", "A2", "Outside_A3", "Outside_A4", "PandaMaru_MV_hills_A5", "PandaMaru_MV_nature1", "Outside_B", "Outside_B2"]
+
+[Data]
+Tile:[0;[True, True, True, True];False;False;False;"A2";(0, 0)]
+Tile:[0;[True, True, True, True];False;False;False;"A2";(48, 0)]
+Tile:[0;[True, True, True, True];False;False;False;"A2";(96, 0)]
+Tile:[0;[True, True, True, True];False;False;False;"A2";(386, 288)]
+Tile:[0;[True, True, True, True];False;False;False;"Outside_B";(0, 0)]
+[/Data]
+</Tileset>
