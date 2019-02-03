@@ -14,13 +14,13 @@ __version__ = "1"
 __authors__ = "Lightpearl"
 
 # Importation des modules complémentaires nécéssaires :
-import constants
-import entitySystem
+from . import constants
+from . import entitySystem
 from pygame.locals import *
 import pygame
 import os
 
-display = pygame.display.set_mode((48*21, 48*17), HWSURFACE | SRCALPHA)
+display = pygame.display.set_mode((1, 1), HWSURFACE | SRCALPHA | NOFRAME)
 
 # Création des objets du module :
 class Tile:
@@ -111,9 +111,11 @@ class Map:
         self.tiles_id = tiles_id
         self.entities = entities
 
-    def render(self, player_pos, tilesets):
-        tileset = tilesets[self.tileset_id]
+    def render(self, player_pos):
+        from . import TILESETS
+        tileset = TILESETS[self.tileset_id]
         air = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
+        entities = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
         ground = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
 
         min_x = max(0, min(player_pos[0]-constants.DISPLAY_SIZE[0]//2, self.size[0]))
@@ -133,7 +135,11 @@ class Map:
                     else:
                         ground.blit(tile.image, (pos_x, pos_y))
 
-        return ground.convert_alpha(), air.convert_alpha()
+        for entity in self.entities:
+            if min_x <= entity.pos[0] < min_x + constants.DISPLAY_SIZE[0] and min_y <= entity.pos[1] < min_y + constants.DISPLAY_SIZE[0]:
+                entities.blit(entity.sprites["South"][1], ((entity.pos[0]-min_x)*tileset.size, (entity.pos[1]-min_y)*tileset.size))
+
+        return ground.convert_alpha(), entities.convert_alpha(), air.convert_alpha()
 
 # Création des fonctions du module :
 def load_tilesets(filename):
@@ -238,11 +244,11 @@ def load_maps(filename):
                                 else:
                                     map_tiles_id = [int(tile_id) for tile_id in content[1:-1].split(", ")]
 
-                        elif getting_entities and not line in ["\n", "[/Entities]"]:
-                            new_entity = entitySystem.get_entity_from_str(line[:-1])
+                        elif getting_entities and not line in ["\n", "[/Entities]\n"]:
+                            new_entity = entitySystem.get_entity_from_str(line[:-1], map_id)
                             map_entities.append(new_entity)
 
-                        elif getting_entities and line == "[/Entities]":
+                        elif getting_entities and line == "[/Entities]\n":
                             getting_entities = False
 
                     file2.close()
@@ -253,10 +259,7 @@ def load_maps(filename):
     return maps
 
 # Tests éffectués sur le module:
-os.chdir("../")
-tilesets = load_tilesets("GameData/Tilesets.data")
-maps = load_maps("GameData/maps.data")
-map = maps[0]
-display.blit(map.render((0, 0), tilesets), (0, 0))
-pygame.display.flip()
-input()
+if __name__ == "__main__":
+    os.chdir("../")
+TILESETS = load_tilesets("GameData/Tilesets.data")
+MAPS = load_maps("GameData/maps.data")

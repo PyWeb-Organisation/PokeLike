@@ -5,4 +5,4 @@ from pygame.locals import *
 import pygame
 
 # Création des variables du module :
-DISPLAY_SIZE = (21, 17)
+DISPLAY_SIZE = (7, 5)
