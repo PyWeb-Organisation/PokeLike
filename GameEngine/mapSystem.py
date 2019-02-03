@@ -113,7 +113,8 @@ class Map:
 
     def render(self, player_pos, tilesets):
         tileset = tilesets[self.tileset_id]
-        surface = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
+        air = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
+        ground = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
 
         min_x = max(0, min(player_pos[0]-constants.DISPLAY_SIZE[0]//2, self.size[0]))
         min_y = max(0, min(player_pos[1]-constants.DISPLAY_SIZE[1]//2, self.size[1]))
@@ -126,9 +127,13 @@ class Map:
                     tile = tileset.tiles[self.tiles_id[pos]]
                     pos_x = (i - min_x)*tileset.size
                     pos_y = (j - min_y)*tileset.size
-                    surface.blit(tile.image, (pos_x, pos_y))
+                    if tile.hitbox == 2:
+                        air.blit(tile.image, (pos_x, pos_y))
 
-        return surface.convert_alpha()
+                    else:
+                        ground.blit(tile.image, (pos_x, pos_y))
+
+        return ground.convert_alpha(), air.convert_alpha()
 
 # Création des fonctions du module :
 def load_tilesets(filename):
