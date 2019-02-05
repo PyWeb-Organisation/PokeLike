@@ -5,4 +5,5 @@ from pygame.locals import *
 import pygame
 
 # Création des variables du module :
-DISPLAY_SIZE = (7, 5)
+DISPLAY_SIZE = (10, 10)
+ENTITY_FREQUECY = 2000 # ms

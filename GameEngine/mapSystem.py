@@ -95,9 +95,6 @@ class Tileset:
     def get_tile(self, id):
         return self.tiles[id]
 
-    def get_tile_image(self, id):
-        return self.tiles[id].image.convert_alpha()
-
 class Map:
     """
     Map of the game
@@ -110,6 +107,14 @@ class Map:
         self.tileset_id = tileset_id
         self.tiles_id = tiles_id
         self.entities = entities
+
+    def get_entities_hitbox(self):
+        hitbox_data = [0 for _ in range(self.size[0] * self.size[1])]
+        for entity in self.entities:
+            pos = entity.pos[1] * self.size[0] + entity.pos[0]
+            hitbox_data[pos] = entity.hitbox
+
+        return hitbox_data
 
     def render(self, player_pos):
         from . import TILESETS
@@ -126,10 +131,10 @@ class Map:
             for i in range(min_x, min(self.size[0], min_x+constants.DISPLAY_SIZE[0])):
                 for j in range(min_y, min(self.size[1], min_y+constants.DISPLAY_SIZE[1])):
                     pos = layout_size*x + j*self.size[0] + i
-                    tile = tileset.tiles[self.tiles_id[pos]]
+                    tile = tileset.get_tile(self.tiles_id[pos])
                     pos_x = (i - min_x)*tileset.size
                     pos_y = (j - min_y)*tileset.size
-                    if tile.hitbox == 2:
+                    if tile.get_hitbox() == 2:
                         air.blit(tile.image, (pos_x, pos_y))
 
                     else:

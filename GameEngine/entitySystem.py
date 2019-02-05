@@ -10,7 +10,8 @@ __authors__ = "Lightpearl"
 from pygame.locals import *
 import pygame
 
-DIRECTIONS = [(0, -1), (0, 1), (1, 0), (-1, 0)]
+DIRECTIONS = {"North": (0, -1), "South": (0, 1), "East": (1, 0), "West": (-1, 0)}
+PASSAGES = {"North": 0, "South": 1, "East": 2, "West": 3}
 
 # Création des objets du module :
 class Entity:
@@ -75,14 +76,14 @@ class Entity:
         self.sprites["West"].append(self.sprite.convert_alpha())
 
     def move(self, direction):
-        from . import MAPS
+        from . import MAPS, TILESETS
         map = MAPS[self.map_id]
-        entities_hitbox = self.map.get_entities_hitbox()
-        new_x = max(0, min(self.map.size[0]-1, self.pos[0] + DIRECTIONS[direction][0]))
-        new_y = max(0, min(self.map.size[1]-1, self.pos[1] + DIRECTIONS[direction][1]))
-        map_tile = map.tiles[new_y*self.map.size[0]+new_x]
-        entities_pos = entities_hitbox[new_y*self.map.size[0]+new_x]
-        if not map_tile.nage and map_tile.passages[direction] and not map_tile.hitbox == 1 and not entities_pos == 1:
+        entities_hitbox = map.get_entities_hitbox()
+        new_x = max(0, min(map.size[0]-1, self.pos[0] + DIRECTIONS[direction][0]))
+        new_y = max(0, min(map.size[1]-1, self.pos[1] + DIRECTIONS[direction][1]))
+        map_tile = TILESETS[map.tileset_id].tiles[map.tiles_id[new_y*map.size[0]+new_x]]
+        entities_pos = entities_hitbox[new_y*map.size[0]+new_x]
+        if not map_tile.nage and map_tile.passages[PASSAGES[direction]] and not map_tile.hitbox == 1 and not entities_pos == 1:
             self.pos = (new_x, new_y)
 
 def get_entity_from_str(string, map_id):
