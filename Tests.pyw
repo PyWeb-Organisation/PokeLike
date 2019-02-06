@@ -30,10 +30,14 @@ while continuer:
 
         elif event.type == ENTITYTIMER:
             for entity in current_map.entities:
-                entity.move(random.choice(["North", "South", "East", "West"]))
+                if not entity.real_pos == 0:
+                    entity.move(random.choice(["North", "South", "East", "West"]))
 
         else:
             pass
+
+    for entity in current_map.entities:
+        entity.process_path()
 
     surfaces = current_map.render(player_pos)
 

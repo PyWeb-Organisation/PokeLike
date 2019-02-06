@@ -107,6 +107,7 @@ class Map:
         self.tileset_id = tileset_id
         self.tiles_id = tiles_id
         self.entities = entities
+        print(entities)
 
     def get_entities_hitbox(self):
         hitbox_data = [0 for _ in range(self.size[0] * self.size[1])]
@@ -142,7 +143,7 @@ class Map:
 
         for entity in self.entities:
             if min_x <= entity.pos[0] < min_x + constants.DISPLAY_SIZE[0] and min_y <= entity.pos[1] < min_y + constants.DISPLAY_SIZE[0]:
-                entities.blit(entity.sprites["South"][1], ((entity.pos[0]-min_x)*tileset.size, (entity.pos[1]-min_y)*tileset.size))
+                entities.blit(entity.sprites[entity.facing][entity.walk_state], ((entity.save_pos[0]-min_x)*tileset.size+entitySystem.DIRECTIONS[entity.facing][0]*entity.real_pos, (entity.save_pos[1]-min_y)*tileset.size+entitySystem.DIRECTIONS[entity.facing][1]*entity.real_pos))
 
         return ground.convert_alpha(), entities.convert_alpha(), air.convert_alpha()
 
@@ -266,5 +267,3 @@ def load_maps(filename):
 # Tests éffectués sur le module:
 if __name__ == "__main__":
     os.chdir("../")
-TILESETS = load_tilesets("GameData/Tilesets.data")
-MAPS = load_maps("GameData/maps.data")

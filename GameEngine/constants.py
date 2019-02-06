@@ -6,4 +6,5 @@ import pygame
 
 # Création des variables du module :
 DISPLAY_SIZE = (10, 10)
-ENTITY_FREQUECY = 2000 # ms
+ENTITY_FREQUECY = 400 # ms
+ENTITY_PIXEL_SPEED = 4
