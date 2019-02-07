@@ -127,8 +127,8 @@ class Map:
         air = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
         entities = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
         ground = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
-        min_x = max(0, min(player_pos[0]-constants.DISPLAY_SIZE[0]//2, self.size[0]))
-        min_y = max(0, min(player_pos[1]-constants.DISPLAY_SIZE[1]//2, self.size[1]))
+        min_x = max(0, min(player_pos[0]-constants.DISPLAY_SIZE[0]//2, self.size[0]-constants.DISPLAY_SIZE[0]))
+        min_y = max(0, min(player_pos[1]-constants.DISPLAY_SIZE[1]//2, self.size[1]-constants.DISPLAY_SIZE[1]))
         layout_size = self.size[0] * self.size[1]
         nb_layout = int(len(self.tiles_id) / layout_size)
         for x in range(nb_layout):
