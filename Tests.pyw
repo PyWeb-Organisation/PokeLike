@@ -14,6 +14,8 @@ GE.pygame.display.set_icon(icone)
 
 GE.pygame.display.set_caption("Test Envirronement PokéLike")
 
+clock = GE.pygame.time.Clock()
+
 current_map = GE.MAPS[0]
 
 for entity in current_map.entities:
@@ -27,6 +29,7 @@ ENTITYTIMER = GE.USEREVENT + 1
 GE.pygame.time.set_timer(ENTITYTIMER, GE.constants.ENTITY_FREQUECY)
 
 while continuer:
+    clock.tick(60)
     for event in GE.pygame.event.get():
         if event.type == GE.QUIT:
             continuer = False

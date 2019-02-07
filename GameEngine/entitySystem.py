@@ -117,7 +117,6 @@ class Entity:
             self.pos = (new_x, new_y)
 
     def process_move(self, action):
-        print("launch move")
         self.facing = action[0]
         self.real_pos = constants.ENTITY_PIXEL_SPEED
         self.state_pos = action[1]
