@@ -28,7 +28,6 @@ class Entity:
         self.code = code
         self.pos = pos
         self.map_id = map_id
-        self.goal = None
         self.facing = "South"
         self.real_pos = 0
         self.state_pos = pos
