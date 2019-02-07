@@ -8,10 +8,10 @@ __authors__ = "Lightpearl"
 
 # Importation des modules complémentaires nécéssaires :
 from pygame.locals import *
-from multiprocessing import Queue
-import threading
+from . import workerSystem
 from . import constants
 import pygame
+import time
 
 DIRECTIONS = {"North": (0, -1), "South": (0, 1), "East": (1, 0), "West": (-1, 0)}
 PASSAGES = {"North": 0, "South": 1, "East": 2, "West": 3}
@@ -28,12 +28,13 @@ class Entity:
         self.code = code
         self.pos = pos
         self.map_id = map_id
-        self.action_queue = Queue()
         self.goal = None
         self.facing = "South"
         self.real_pos = 0
+        self.state_pos = pos
         self.walk_state = 1
-        self.save_pos = (0, 0)
+        self.save_pos = pos
+        self.move_worker = workerSystem.QueueWorker(self.process_move)
         self.load_sprites(sprites, sprite_size)
 
     def load_sprites(self, sprites, sprite_size):
@@ -110,10 +111,32 @@ class Entity:
         entities_hitbox = map.get_entities_hitbox()
         new_x = max(0, min(map.size[0]-1, self.pos[0] + DIRECTIONS[direction][0]))
         new_y = max(0, min(map.size[1]-1, self.pos[1] + DIRECTIONS[direction][1]))
-        map_tile = TILESETS[map.tileset_id].tiles[map.tiles_id[new_y*map.size[0]+new_x]]
         entities_pos = entities_hitbox[new_y*map.size[0]+new_x]
-        if not map_tile.nage and map_tile.passages[PASSAGES[direction]] and not map_tile.hitbox == 1 and not entities_pos == 1 and not self.pos == (new_x, new_y):
-            self.action_queue.put(("move", direction, (new_x, new_y)))
+        if  not map.map_hitbox[new_y*map.size[0]+new_x] == 1 and not entities_pos == 1 and not self.pos == (new_x, new_y): #not map_tile.nage and map_tile.passages[PASSAGES[direction]] and
+            self.move_worker.put((direction, (new_x, new_y)))
+            self.pos = (new_x, new_y)
+
+    def process_move(self, action):
+        print("launch move")
+        self.facing = action[0]
+        self.real_pos = constants.ENTITY_PIXEL_SPEED
+        self.state_pos = action[1]
+        from . import MAPS, TILESETS
+        goal = TILESETS[MAPS[self.map_id].tileset_id].size
+        while self.real_pos % goal != 0:
+            if self.real_pos % goal <= goal//2:
+                self.walk_state = 0
+                self.real_pos += constants.ENTITY_PIXEL_SPEED
+
+            elif self.real_pos % goal > goal//2:
+                self.walk_state = 2
+                self.real_pos += constants.ENTITY_PIXEL_SPEED
+
+            time.sleep(constants.ENTITY_SPEED)
+
+        self.real_pos = 0
+        self.walk_state = 1
+        self.save_pos = self.state_pos
 
 
 def get_entity_from_str(string, map_id):

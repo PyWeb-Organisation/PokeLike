@@ -12,5 +12,6 @@ Tile:[0;[True, True, True, True];False;False;False;"A2";(48, 0)]
 Tile:[0;[True, True, True, True];False;False;False;"A2";(96, 0)]
 Tile:[0;[True, True, True, True];False;False;False;"A2";(384, 288)]
 Tile:[0;[True, True, True, True];False;False;False;"Outside_B";(0, 0)]
+Tile:[1;[False, False, False, False];False;False;False;"Outside_B";(96, 624)]
 [/Data]
 </Tileset>

@@ -100,6 +100,7 @@ class Map:
     Map of the game
     """
     def __init__(self, id, size, name, displayed_name, tileset_id, tiles_id, entities):
+        from . import TILESETS
         self.id = id
         self.size = size
         self.name = name
@@ -107,7 +108,10 @@ class Map:
         self.tileset_id = tileset_id
         self.tiles_id = tiles_id
         self.entities = entities
-        print(entities)
+        self.map_hitbox = [0 for _ in range(self.size[0]*self.size[1])]
+        for pos, tile_id in enumerate(self.tiles_id):
+            real_pos = pos % (self.size[0]*self.size[1])
+            self.map_hitbox[real_pos] = max(self.map_hitbox[real_pos], TILESETS[self.tileset_id].tiles[tile_id].hitbox)
 
     def get_entities_hitbox(self):
         hitbox_data = [0 for _ in range(self.size[0] * self.size[1])]
@@ -123,7 +127,6 @@ class Map:
         air = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
         entities = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
         ground = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
-
         min_x = max(0, min(player_pos[0]-constants.DISPLAY_SIZE[0]//2, self.size[0]))
         min_y = max(0, min(player_pos[1]-constants.DISPLAY_SIZE[1]//2, self.size[1]))
         layout_size = self.size[0] * self.size[1]

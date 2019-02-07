@@ -16,6 +16,9 @@ GE.pygame.display.set_caption("Test Envirronement PokéLike")
 
 current_map = GE.MAPS[0]
 
+for entity in current_map.entities:
+    entity.move_worker.start()
+
 player_pos = (0, 0)
 
 continuer = True
@@ -30,14 +33,11 @@ while continuer:
 
         elif event.type == ENTITYTIMER:
             for entity in current_map.entities:
-                if not entity.real_pos == 0:
+                if entity.real_pos == 0:
                     entity.move(random.choice(["North", "South", "East", "West"]))
 
         else:
             pass
-
-    for entity in current_map.entities:
-        entity.process_path()
 
     surfaces = current_map.render(player_pos)
 
@@ -47,6 +47,9 @@ while continuer:
         display.blit(surface, (0, 0))
 
     GE.pygame.display.flip()
+
+for entity in current_map.entities:
+    entity.move_worker.destroy()
 
 GE.pygame.quit()
 exit(-1)
