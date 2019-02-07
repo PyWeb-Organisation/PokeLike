@@ -107,34 +107,35 @@ class Entity:
     def move(self, direction):
         from . import MAPS, TILESETS
         map = MAPS[self.map_id]
-        entities_hitbox = map.get_entities_hitbox()
         new_x = max(0, min(map.size[0]-1, self.pos[0] + DIRECTIONS[direction][0]))
         new_y = max(0, min(map.size[1]-1, self.pos[1] + DIRECTIONS[direction][1]))
-        entities_pos = entities_hitbox[new_y*map.size[0]+new_x]
-        if  not map.map_hitbox[new_y*map.size[0]+new_x] == 1 and not entities_pos == 1 and not self.pos == (new_x, new_y): #not map_tile.nage and map_tile.passages[PASSAGES[direction]] and
+        if self.real_pos == 0:
             self.move_worker.put((direction, (new_x, new_y)))
-            self.pos = (new_x, new_y)
 
     def process_move(self, action):
         self.facing = action[0]
-        self.real_pos = constants.ENTITY_PIXEL_SPEED
-        self.state_pos = action[1]
-        from . import MAPS, TILESETS
-        goal = TILESETS[MAPS[self.map_id].tileset_id].size
-        while self.real_pos % goal != 0:
-            if self.real_pos % goal <= goal//2:
-                self.walk_state = 0
-                self.real_pos += constants.ENTITY_PIXEL_SPEED
+        from . import MAPS, TILESETS, PLAYER
+        map = MAPS[self.map_id]
+        map_hitbox=map.map_hitbox[action[1][1]*map.size[0]+action[1][0]]
+        entity_hitbox=map.get_entities_hitbox()[action[1][1]*map.size[0]+action[1][0]]
+        if  not map_hitbox == 1 and not entity_hitbox == 1 and not self.pos == (action[1][0], action[1][1]) and not PLAYER.pos == (action[1][0], action[1][1]): #not map_tile.nage and map_tile.passages[PASSAGES[direction]] and
+            self.real_pos = constants.ENTITY_PIXEL_SPEED
+            self.pos = action[1]
+            goal = TILESETS[MAPS[self.map_id].tileset_id].size
+            while self.real_pos % goal != 0:
+                if self.real_pos % goal <= goal//2:
+                    self.walk_state = 0
+                    self.real_pos += constants.ENTITY_PIXEL_SPEED
 
-            elif self.real_pos % goal > goal//2:
-                self.walk_state = 2
-                self.real_pos += constants.ENTITY_PIXEL_SPEED
+                elif self.real_pos % goal > goal//2:
+                    self.walk_state = 2
+                    self.real_pos += constants.ENTITY_PIXEL_SPEED
 
-            time.sleep(constants.ENTITY_SPEED)
+                time.sleep(constants.ENTITY_SPEED)
 
-        self.real_pos = 0
-        self.walk_state = 1
-        self.save_pos = self.state_pos
+            self.real_pos = 0
+            self.walk_state = 1
+            self.save_pos = self.pos
 
 
 def get_entity_from_str(string, map_id):

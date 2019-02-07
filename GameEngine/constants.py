@@ -5,11 +5,8 @@ from pygame.locals import *
 import pygame
 
 # Création des variables du module :
-DISPLAY_SIZE = (10, 10)
+DISPLAY_SIZE = (5, 5)
 ENTITY_FREQUECY = 1000 # ms
-ENTITY_PIXEL_SPEED = 1
-ENTITY_SPEED =  1/96 # s
-<<<<<<< HEAD
-=======
+ENTITY_PIXEL_SPEED = 2
+ENTITY_SPEED =  0.01 # s
 CURRENT_MAP=0
->>>>>>> b02a77da180dba24f4092ce4f766f538dd9ad39a

@@ -7,3 +7,4 @@ import pygame
 
 TILESETS = mapSystem.load_tilesets("GameData/Tilesets.data")
 MAPS = mapSystem.load_maps("GameData/maps.data")
+PLAYER = playerSystem.Player()

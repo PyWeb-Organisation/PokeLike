@@ -15,17 +15,11 @@ GE.pygame.display.set_icon(icone)
 
 GE.pygame.display.set_caption("Test Envirronement PokéLike")
 
-<<<<<<< HEAD
-clock = GE.pygame.time.Clock()
-
-current_map = GE.MAPS[0]
-=======
 clock=GE.pygame.time.Clock()
 
 current_map = GE.MAPS[GE.constants.CURRENT_MAP]
 
-player=GE.playerSystem.Player()
->>>>>>> b02a77da180dba24f4092ce4f766f538dd9ad39a
+player=GE.PLAYER
 
 for entity in current_map.entities:
     entity.move_worker.start()
@@ -37,6 +31,7 @@ continuer = True
 
 ENTITYTIMER = GE.USEREVENT + 1
 GE.pygame.time.set_timer(ENTITYTIMER, GE.constants.ENTITY_FREQUECY)
+GE.pygame.key.set_repeat(1, 1)
 
 while continuer:
     clock.tick(60)
