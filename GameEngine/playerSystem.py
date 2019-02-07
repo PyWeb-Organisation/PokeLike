@@ -32,6 +32,3 @@ class Player(entitySystem.Entity):
         if map_hitbox != 1 and entity_hitbox != 1 and not self.pos==(new_x,new_y) and self.real_pos==0:
             self.move_worker.put((direction, (new_x, new_y)))
             self.pos = (new_x, new_y)
-
-
-    
