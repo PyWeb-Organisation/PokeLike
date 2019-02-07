@@ -55,15 +55,15 @@ while continuer:
         else:
             pass
 
-    surfaces = current_map.render(player.save_pos)
+    entities = current_map.render_entities()
 
     display.fill((0, 0, 0))
-    min_x=max(0,min(player.save_pos[0]-GE.constants.DISPLAY_SIZE[0]//2,current_map.size[0]-GE.constants.DISPLAY_SIZE[0]))
-    min_y=max(0,min(player.save_pos[1]-GE.constants.DISPLAY_SIZE[1]//2,current_map.size[1]-GE.constants.DISPLAY_SIZE[1]))
-    display.blit(surfaces[0],(0,0))
-    display.blit(player.sprites[player.facing][player.walk_state],((player.save_pos[0]-min_x)*GE.TILESETS[current_map.tileset_id].size+GE.entitySystem.DIRECTIONS[player.facing][0]*player.real_pos,(player.save_pos[1]-min_y)*GE.TILESETS[current_map.tileset_id].size+GE.entitySystem.DIRECTIONS[player.facing][1]*player.real_pos))
-    display.blit(surfaces[1],(0,0))
-    display.blit(surfaces[2],(0,0))
+    camera = player.get_camera()
+    display.blit(current_map.ground_surface, camera)
+    display.blit(entities, camera)
+    display.blit(player.sprites[player.facing][player.walk_state], (player.save_pos[0]*48+player.real_pos*GE.entitySystem.DIRECTIONS[player.facing][0]+camera[0], player.save_pos[1]*48+player.real_pos*GE.entitySystem.DIRECTIONS[player.facing][1]+camera[1]))
+    display.blit(current_map.air_surface, camera)
+
     GE.pygame.display.flip()
 
 for entity in current_map.entities:

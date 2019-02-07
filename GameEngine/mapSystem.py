@@ -112,6 +112,7 @@ class Map:
         for pos, tile_id in enumerate(self.tiles_id):
             real_pos = pos % (self.size[0]*self.size[1])
             self.map_hitbox[real_pos] = max(self.map_hitbox[real_pos], TILESETS[self.tileset_id].tiles[tile_id].hitbox)
+        self.render_surfaces()
 
     def get_entities_hitbox(self):
         hitbox_data = [0 for _ in range(self.size[0] * self.size[1])]
@@ -121,34 +122,30 @@ class Map:
 
         return hitbox_data
 
-    def render(self, player_pos):
+    def render_surfaces(self):
         from . import TILESETS
-        tileset = TILESETS[self.tileset_id]
-        air = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
-        entities = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
-        ground = pygame.Surface((constants.DISPLAY_SIZE[0]*tileset.size, constants.DISPLAY_SIZE[1]*tileset.size), HWSURFACE | SRCALPHA)
-        min_x = max(0, min(player_pos[0]-constants.DISPLAY_SIZE[0]//2, self.size[0]-constants.DISPLAY_SIZE[0]))
-        min_y = max(0, min(player_pos[1]-constants.DISPLAY_SIZE[1]//2, self.size[1]-constants.DISPLAY_SIZE[1]))
-        layout_size = self.size[0] * self.size[1]
-        nb_layout = int(len(self.tiles_id) / layout_size)
-        for x in range(nb_layout):
-            for i in range(min_x, min(self.size[0], min_x+constants.DISPLAY_SIZE[0])):
-                for j in range(min_y, min(self.size[1], min_y+constants.DISPLAY_SIZE[1])):
-                    pos = layout_size*x + j*self.size[0] + i
-                    tile = tileset.get_tile(self.tiles_id[pos])
-                    pos_x = (i - min_x)*tileset.size
-                    pos_y = (j - min_y)*tileset.size
-                    if tile.get_hitbox() == 2:
-                        air.blit(tile.image, (pos_x, pos_y))
+        air = pygame.Surface((self.size[0]*TILESETS[self.tileset_id].size, self.size[1]*TILESETS[self.tileset_id].size), HWSURFACE | SRCALPHA)
+        ground = pygame.Surface((self.size[0]*TILESETS[self.tileset_id].size, self.size[1]*TILESETS[self.tileset_id].size), HWSURFACE | SRCALPHA)
 
-                    else:
-                        ground.blit(tile.image, (pos_x, pos_y))
+        for x, tile_id in enumerate(self.tiles_id):
+            pos_x = x % (self.size[0]*self.size[1]) % self.size[0] * TILESETS[self.tileset_id].size
+            pos_y = x % (self.size[0]*self.size[1]) // self.size[0] * TILESETS[self.tileset_id].size
+            tile = TILESETS[self.tileset_id].tiles[tile_id]
+            if tile.hitbox == 2:
+                air.blit(tile.image, (pos_x, pox_y))
 
+            else:
+                ground.blit(tile.image, (pos_x, pos_y))
+
+        self.air_surface = air.convert_alpha()
+        self.ground_surface = ground.convert_alpha()
+
+    def render_entities(self):
+        from . import TILESETS
+        surface = pygame.Surface((self.size[0]*TILESETS[self.tileset_id].size, self.size[1]*TILESETS[self.tileset_id].size), HWSURFACE | SRCALPHA)
         for entity in self.entities:
-            if min_x <= entity.pos[0] < min_x + constants.DISPLAY_SIZE[0] and min_y <= entity.pos[1] < min_y + constants.DISPLAY_SIZE[0]:
-                entities.blit(entity.sprites[entity.facing][entity.walk_state], ((entity.save_pos[0]-min_x)*tileset.size+entitySystem.DIRECTIONS[entity.facing][0]*entity.real_pos, (entity.save_pos[1]-min_y)*tileset.size+entitySystem.DIRECTIONS[entity.facing][1]*entity.real_pos))
-
-        return ground.convert_alpha(), entities.convert_alpha(), air.convert_alpha()
+            surface.blit(entity.sprites[entity.facing][entity.walk_state], (entity.save_pos[0]*TILESETS[self.tileset_id].size+entity.real_pos*entitySystem.DIRECTIONS[entity.facing][0], (entity.save_pos[1]*TILESETS[self.tileset_id].size+entity.real_pos*entitySystem.DIRECTIONS[entity.facing][1])))
+        return surface.convert_alpha()
 
 # Création des fonctions du module :
 def load_tilesets(filename):
