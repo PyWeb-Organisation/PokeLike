@@ -28,9 +28,9 @@ class Entity:
         self.code = code
         self.pos = pos
         self.map_id = map_id
+        self.blocked = False
         self.facing = "South"
         self.real_pos = 0
-        self.state_pos = pos
         self.walk_state = 1
         self.save_pos = pos
         self.move_worker = workerSystem.QueueWorker(self.process_move)
@@ -109,8 +109,12 @@ class Entity:
         map = MAPS[self.map_id]
         new_x = max(0, min(map.size[0]-1, self.pos[0] + DIRECTIONS[direction][0]))
         new_y = max(0, min(map.size[1]-1, self.pos[1] + DIRECTIONS[direction][1]))
-        if self.real_pos == 0:
+        if self.real_pos == 0 and not self.blocked:
             self.move_worker.put((direction, (new_x, new_y)))
+
+    def action(self):
+        for code in self.code:
+            CODE_DICTIONNARY[code[0]](*code[1:], self)
 
     def process_move(self, action):
         self.facing = action[0]
@@ -141,3 +145,17 @@ class Entity:
 def get_entity_from_str(string, map_id):
     content = dict([component.split(": ") for component in string[1:-1].split("; ")])
     return Entity(int(content["sprite_size"]), pygame.image.load(content["sprite"]).convert_alpha(), content["name"], int(content["hitbox"]), content["loader"], eval(content["code"]), eval(content["pos"]), map_id)
+
+def show_message(message_list, entity):
+    from . import PLAYER
+    entity.blocked = True
+    PLAYER.blocked = True
+    time.sleep(2)
+    entity.blocked = False
+    PLAYER.blocked = False
+
+
+# Création des variables du module :
+CODE_DICTIONNARY = {
+    "message": show_message,
+}

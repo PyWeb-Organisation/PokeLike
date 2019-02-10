@@ -52,6 +52,11 @@ while continuer:
                 player.move('West')
             elif event.key == GE.K_RIGHT:
                 player.move('East')
+
+            elif event.key == GE.K_a:
+                for entity in current_map.entities:
+                    if entity.pos == (player.pos[0]+GE.entitySystem.DIRECTIONS[player.facing][0], player.pos[1]+GE.entitySystem.DIRECTIONS[player.facing][1]):
+                        entity.action()
         else:
             pass
 
