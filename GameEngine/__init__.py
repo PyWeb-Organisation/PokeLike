@@ -14,3 +14,4 @@ MAPS = mapSystem.load_maps("GameData/maps.data")
 PLAYER = playerSystem.Player()
 
 sceneSystem.TitleScreen()
+sceneSystem.Options_Screen()

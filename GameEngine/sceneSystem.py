@@ -83,3 +83,38 @@ class TitleScreen(Scene):
         surface.blit(surf_bis, surf_bis_rect)
 
         return surface.convert_alpha()
+
+class Options_Screen (Scene):
+    """
+    """
+    def __init__(self):
+        super().__init__("Options_Screen", (constants.DISPLAY_SIZE[0]*constants.TILE_SIZE, constants.DISPLAY_SIZE[1]*constants.TILE_SIZE))
+        self.cursor_pos = 0
+        self.options = ["option 1","option 2","option 3","option 4","option 5","option 6"]
+        logger.log("le joueur a ouvert les options")
+
+    def move_cursor(self,direction):
+        self.cursor_pos = (self.cursor_pos+ direction)%len(self.options)
+
+
+
+    def render(self):
+        surface = Scene.render(self)
+
+        surf_bis = pygame.Surface((constants.DISPLAY_SIZE[0]*constants.TILE_SIZE, len(self.options)*constants.TILE_SIZE), HWSURFACE | SRCALPHA)
+
+        for i,option in enumerate(self.options):
+            if i == self.cursor_pos:
+                text = constants.FONT_REGULAR.render(option, True, constants.Color.green)
+            else:
+                text = constants.FONT_REGULAR.render(option, True, constants.Color.black)
+            text_pos = (constants.DISPLAY_SIZE[0]*constants.TILE_SIZE-constants.TILE_SIZE, constants.TILE_SIZE // 2 + i*constants.TILE_SIZE)
+            text_rect = text.get_rect(midright=text_pos)
+            surf_bis.blit(text, text_rect)
+
+        options_pos = ((constants.DISPLAY_SIZE[0] * constants.TILE_SIZE) // 2, (constants.DISPLAY_SIZE[1] * constants.TILE_SIZE) // 2)
+        surf_bis_rect = surf_bis.get_rect(center=options_pos)
+
+        surface.blit(surf_bis, surf_bis_rect)
+        return surface.convert_alpha()
+    
