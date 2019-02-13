@@ -30,6 +30,19 @@ class Scene:
         surface = pygame.Surface(self.size, HWSURFACE | SRCALPHA)
         return surface.convert_alpha()
 
+    def run(self, display):
+        logger.log("Start {}".format(self.name), level="Info")
+        continuer = True
+        while continuer:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    continuer = False
+            display.fill(constants.Color.white)
+            display.blit(self.render(), (0, 0))
+            pygame.display.flip()
+
+        logger.log("Quit {}".format(self.name), level="Info")
+
 class TitleScreen(Scene):
     """
     """
@@ -46,8 +59,27 @@ class TitleScreen(Scene):
     def render(self):
         surface = Scene.render(self)
 
-        title_pos = constants.DISPLAY_SIZE[0] * constants.TILE_SIZE // 2, constants.DISPLAY_SIZE[1] * constants.TILE_SIZE // 4
+        title_pos = ((constants.DISPLAY_SIZE[0] * constants.TILE_SIZE) // 2, (constants.DISPLAY_SIZE[1] * constants.TILE_SIZE) // 4)
 
         title = constants.FONT_BIG.render(constants.GAME_TITLE, True, constants.Color.yellow)
+        title_rect = title.get_rect(center=title_pos)
+
+        surface.blit(title, title_rect)
+
+        surf_bis = pygame.Surface((constants.DISPLAY_SIZE[0]*constants.TILE_SIZE, len(self.options)*constants.TILE_SIZE), HWSURFACE | SRCALPHA)
+
+        for i, option in enumerate(self.options):
+            if i == self.cursor_pos:
+                text = constants.FONT_REGULAR.render(option, True, constants.Color.green)
+            else:
+                text = constants.FONT_REGULAR.render(option, True, constants.Color.black)
+            text_pos = (constants.DISPLAY_SIZE[0]*constants.TILE_SIZE // 2, constants.TILE_SIZE // 2 + i*constants.TILE_SIZE)
+            text_rect = text.get_rect(center=text_pos)
+            surf_bis.blit(text, text_rect)
+
+        options_pos = ((constants.DISPLAY_SIZE[0] * constants.TILE_SIZE) // 2, 2*(constants.DISPLAY_SIZE[1] * constants.TILE_SIZE) // 3)
+        surf_bis_rect = surf_bis.get_rect(center=options_pos)
+
+        surface.blit(surf_bis, surf_bis_rect)
 
         return surface.convert_alpha()
