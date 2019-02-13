@@ -7,6 +7,7 @@ __version__ = "1"
 __authors__ = "Lightpearl"
 
 # Importation des modules complémentaires nécéssaires :
+from . import logger
 from . import entitySystem
 from pygame.locals import *
 import pygame
@@ -20,6 +21,7 @@ class Player(entitySystem.Entity):
     """
     def __init__(self):
         entitySystem.Entity.__init__(self,48, pygame.image.load('GameData\\pictures\\Character\\Actor1.png').convert_alpha(),'Player', 1,'action',[],(0,0),0)
+        logger.log("Création du joueur terminée")
 
     def get_camera(self):
         from . import MAPS, TILESETS

@@ -15,6 +15,8 @@ GE.pygame.display.set_icon(icone)
 
 GE.pygame.display.set_caption("Test Envirronement PokéLike")
 
+JOYSTICK_CONNECTED = GE.pygame.joystick.get_count() >= 1
+
 clock=GE.pygame.time.Clock()
 
 current_map = GE.MAPS[GE.constants.CURRENT_MAP]
@@ -31,10 +33,13 @@ continuer = True
 
 ENTITYTIMER = GE.USEREVENT + 1
 GE.pygame.time.set_timer(ENTITYTIMER, GE.constants.ENTITY_FREQUECY)
-GE.pygame.key.set_repeat(1, 1)
+
+if JOYSTICK_CONNECTED:
+    MAIN_JOYSTICK = GE.pygame.joystick.Joystick(0)
+    MAIN_JOYSTICK.init()
 
 while continuer:
-    clock.tick(60)
+    clock.tick(120)
     for event in GE.pygame.event.get():
         if event.type == GE.QUIT:
             continuer = False
@@ -43,22 +48,37 @@ while continuer:
             for entity in current_map.entities:
                 if entity.real_pos == 0:
                     entity.move(random.choice(["North", "South", "East", "West"]))
-        elif event.type == GE.KEYDOWN:
-            if event.key == GE.K_UP:
-                player.move('North')
-            elif event.key == GE.K_DOWN:
-                player.move('South')
-            elif event.key == GE.K_LEFT:
-                player.move('West')
-            elif event.key == GE.K_RIGHT:
-                player.move('East')
 
-            elif event.key == GE.K_a:
-                for entity in current_map.entities:
-                    if entity.pos == (player.pos[0]+GE.entitySystem.DIRECTIONS[player.facing][0], player.pos[1]+GE.entitySystem.DIRECTIONS[player.facing][1]):
-                        entity.action()
-        else:
-            pass
+    if JOYSTICK_CONNECTED:
+
+        if MAIN_JOYSTICK.get_button(1):
+            for entity in current_map.entities:
+                if entity.pos == (player.pos[0]+GE.entitySystem.DIRECTIONS[player.facing][0], player.pos[1]+GE.entitySystem.DIRECTIONS[player.facing][1]):
+                    entity.action()
+
+        hat_state = MAIN_JOYSTICK.get_hat(0)
+        if hat_state == (0, 1):
+            player.move("North")
+        elif hat_state == (0, -1):
+            player.move("South")
+        elif hat_state == (1, 0):
+            player.move("East")
+        elif hat_state == (-1, 0):
+            player.move("West")
+
+    keys = GE.pygame.key.get_pressed()
+    if keys[GE.K_q]:
+        for entity in current_map.entities:
+            if entity.pos == (player.pos[0]+GE.entitySystem.DIRECTIONS[player.facing][0], player.pos[1]+GE.entitySystem.DIRECTIONS[player.facing][1]):
+                entity.action()
+    elif keys[GE.K_UP]:
+        player.move("North")
+    elif keys[GE.K_DOWN]:
+        player.move("South")
+    elif keys[GE.K_LEFT]:
+        player.move("West")
+    elif keys[GE.K_RIGHT]:
+        player.move("East")
 
     entities = current_map.render_entities()
 

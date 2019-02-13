@@ -2,12 +2,12 @@ Tileset:0
 Size:[21, 15]
 Tiles:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
 [Entities]
-{name: ENT002; pos: (3, 0); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: [("message", ["Hello guys !"])]}
+{name: ENT001; pos: (3, 0); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: [("message", ["Hello guys !"])]}
 {name: ENT002; pos: (0, 3); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
-{name: ENT002; pos: (0, 6); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
-{name: ENT002; pos: (3, 6); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
-{name: ENT002; pos: (6, 6); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
-{name: ENT002; pos: (0, 9); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
-{name: ENT002; pos: (3, 9); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
-{name: ENT002; pos: (6, 9); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
+{name: ENT003; pos: (0, 6); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
+{name: ENT004; pos: (3, 6); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
+{name: ENT005; pos: (6, 6); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
+{name: ENT006; pos: (0, 9); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
+{name: ENT007; pos: (3, 9); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
+{name: ENT008; pos: (6, 9); sprite_size: 48; sprite: GameData\pictures\Character\Actor2.png; hitbox: 1; loader: action; code: []}
 [/Entities]

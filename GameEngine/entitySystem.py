@@ -7,6 +7,7 @@ __version__ = "1"
 __authors__ = "Lightpearl"
 
 # Importation des modules complémentaires nécéssaires :
+from . import logger
 from pygame.locals import *
 from . import workerSystem
 from . import constants
@@ -35,6 +36,7 @@ class Entity:
         self.save_pos = pos
         self.move_worker = workerSystem.QueueWorker(self.process_move)
         self.load_sprites(sprites, sprite_size)
+        logger.log("Création de l'entitée [{}] éffectuée".format(self.name))
 
     def load_sprites(self, sprites, sprite_size):
         self.sprites = {}
@@ -117,6 +119,7 @@ class Entity:
             CODE_DICTIONNARY[code[0]](*code[1:], self)
 
     def process_move(self, action):
+        logger.log("process move of entity {} with parameters {}".format(self.name, action), worker="MOVE-WORKER")
         self.facing = action[0]
         from . import MAPS, TILESETS, PLAYER
         map = MAPS[self.map_id]

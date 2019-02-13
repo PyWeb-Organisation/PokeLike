@@ -14,6 +14,7 @@ __version__ = "1"
 __authors__ = "Lightpearl"
 
 # Importation des modules complémentaires nécéssaires :
+from . import logger
 from . import constants
 from . import entitySystem
 from pygame.locals import *
@@ -113,6 +114,7 @@ class Map:
             real_pos = pos % (self.size[0]*self.size[1])
             self.map_hitbox[real_pos] = max(self.map_hitbox[real_pos], TILESETS[self.tileset_id].tiles[tile_id].hitbox)
         self.render_surfaces()
+        logger.log("Création de la map [{}] éffectué".format(self.name))
 
     def get_entities_hitbox(self):
         hitbox_data = [0 for _ in range(self.size[0] * self.size[1])]
