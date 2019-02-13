@@ -8,6 +8,8 @@ import pygame
 pygame.font.init()
 
 # Création des variables du module :
+GAME_TITLE = "Pokélike"
+
 DISPLAY_SIZE = (17, 13)
 ENTITY_FREQUECY = 2000 # ms
 ENTITY_PIXEL_SPEED = 2
@@ -16,8 +18,8 @@ CURRENT_MAP = 0
 TILE_SIZE = 48
 
 FONT_SMALL = pygame.font.Font("GameData\\Fonts\\Pokemon Solid.ttf", 16)
-FONT_SMALL = pygame.font.Font("GameData\\Fonts\\Pokemon Solid.ttf", 32)
-FONT_SMALL = pygame.font.Font("GameData\\Fonts\\Pokemon Solid.ttf", 48)
+FONT_REGULAR = pygame.font.Font("GameData\\Fonts\\Pokemon Solid.ttf", 32)
+FONT_BIG = pygame.font.Font("GameData\\Fonts\\Pokemon Solid.ttf", 48)
 
 # Création des objets du module :
 class Color:

@@ -48,4 +48,6 @@ class TitleScreen(Scene):
 
         title_pos = constants.DISPLAY_SIZE[0] * constants.TILE_SIZE // 2, constants.DISPLAY_SIZE[1] * constants.TILE_SIZE // 4
 
+        title = constants.FONT_BIG.render(constants.GAME_TITLE, True, constants.Color.yellow)
+
         return surface.convert_alpha()
