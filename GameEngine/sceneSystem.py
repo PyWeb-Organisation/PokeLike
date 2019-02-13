@@ -13,6 +13,7 @@ from . import logger
 from . import constants
 from pygame.locals import *
 import pygame
+import sys
 
 # Création des variables globales du module
 SCENES = {}
@@ -84,6 +85,52 @@ class TitleScreen(Scene):
 
         return surface.convert_alpha()
 
+    def run(self, display):
+        logger.log("Lancement de la scène d'écran titre", level="Info")
+
+        continuer = True
+
+        JOYSTICK_PLUGED = pygame.joystick.get_count() >= 1
+
+        if JOYSTICK_PLUGED:
+            MAIN_JOYSTICK = pygame.joystick.Joystick(0)
+            MAIN_JOYSTICK.init()
+
+        clock = pygame.time.Clock()
+
+        while continuer:
+            clock.tick(5)
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    sys.exit(-1)
+
+            if JOYSTICK_PLUGED:
+                if MAIN_JOYSTICK.get_button(0):
+                    continuer = False
+
+                hat = MAIN_JOYSTICK.get_hat(0)
+                if hat == (0, -1):
+                    self.move_cursor(1)
+                if hat == (0, 1):
+                    self.move_cursor(-1)
+
+            else:
+                keys = pygame.key.get_pressed()
+                if keys[K_UP]:
+                    self.move_cursor(-1)
+                elif keys[K_DOWN]:
+                    self.move_cursor(1)
+                elif keys[K_q]:
+                    continuer = False
+
+            display.fill(constants.Color.white)
+            display.blit(self.render(), (0, 0))
+            pygame.display.flip()
+
+        logger.log("Sortie de la scène d'écran titre", level="Info")
+        return self.options[self.cursor_pos]
+
+
 class Options_Screen (Scene):
     """
     """
@@ -117,4 +164,3 @@ class Options_Screen (Scene):
 
         surface.blit(surf_bis, surf_bis_rect)
         return surface.convert_alpha()
-    
